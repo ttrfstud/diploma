@@ -1,0 +1,14 @@
+{
+  "name": "diploma",
+  "version": "0.0.0",
+  "description": "diploma vs ttrf",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ttrfstud/diploma.git"
+  },
+  "author": "",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/ttrfstud/diploma/issues"
+  }
+}

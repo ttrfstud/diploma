@@ -1,14 +1,11 @@
 var req         = require('http').request;
 var read        = require('fs').createReadStream;
-var atom_hetatm = require('./automata').atom_hetatm;
-var model       = require('./automata').model;
 var util        = require('./util');
-var init_model  = require('./init_model');
 
 function parser(id, model, callback) {
 	this._id = id;
 
-	this._model = init_model(model);
+	this._model = util.init_model(model);
 	this._cb = callback;
 
 	this._atoms = [];

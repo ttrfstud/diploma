@@ -1,5 +1,6 @@
-var tree = require('./automata_tree');
-var signals = require('./signals');
+var tree                    = require('./automata_tree');
+var signals                 = require('./signals');
+var determine_automaton     = require('../util').determine_automaton;
 
 function reader () {
 	this.line_offset = 0;
@@ -93,27 +94,3 @@ reader.prototype.read_more = function (chunk) {
 		}
 	}
 };
-
-function determine_automaton(chunk, i, determination_array) {
-	var _determination_array = determination_array ? determination_array.slice(0) : [];
-	var tree = tree;
-
-	for (var i = 0; i < _determination_array.length; i++) {
-		tree = tree[_determination_array[i]];
-	}
-
-	while(chunk[i] && !Array.isArray(tree = tree[chunk[i]])) {
-		_determination_array.push(chunk[i]);
-		i++;
-	}
-
-	if (!Array.isArray(tree)) {
-		return {
-			determination_array: _determination_array,
-		};
-	} else {
-		return {
-			auto: tree
-		};
-	}
-}
