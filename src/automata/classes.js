@@ -78,6 +78,9 @@ module.exports = {
 	nl: {
 		0x0a : 1, 
 		0x0d : 1
+	},
+	apostrophe: {
+		0x27: 1
 	}
 };
 

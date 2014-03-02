@@ -15,10 +15,10 @@ module.exports = [
 /*10 */[union(classes.dec, classes.w), 'serial'],  
 /*11 */[union(classes.dec), 'serial'],  
 /*12 */[union(classes.w), '_'], /* ws */
-/*13 */[union(classes.an, classes.dec, classes.w), 'atom_name'], /* atom name */
-/*14 */[union(classes.an, classes.dec), 'atom_name'],
-/*15 */[union(classes.an, classes.dec, classes.w), 'atom_name'],
-/*16 */[union(classes.an, classes.dec, classes.w), 'atom_name'],
+/*13 */[union(classes.an, classes.dec, classes.apostrophe, classes.w), 'atom_name'], /* atom name */
+/*14 */[union(classes.an, classes.dec, classes.apostrophe), 'atom_name'],
+/*15 */[union(classes.an, classes.dec, classes.apostrophe, classes.w), 'atom_name'],
+/*16 */[union(classes.an, classes.dec, classes.apostrophe, classes.w), 'atom_name'],
 /*17 */[union(classes.an, classes.w), 'alt_loc'], /* alt_loc */
 /*18 */[union(classes.an, classes.w), 'residue_name'], /* residue_name */
 /*19 */[union(classes.an, classes.w), 'residue_name'], 
