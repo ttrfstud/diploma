@@ -71,7 +71,7 @@ describe('automaton', function () {
 	// -- sa, ee
 	// -- sa, ea
 	// =>
-	// a < b => sb, eb (v)| se, eb (v)| sa, eb (v)| sa, ee | sa, ea
+	// a < b => sb, eb (v)| se, eb (v)| sa, eb (v)| sa, ee (v)| sa, ea (v)
 	// 3. a > b
 	// -- sb, eb
 	// -- sb, ee
@@ -414,4 +414,114 @@ describe('automaton', function () {
 
 		done();
 	});
+
+	it('#a < b, sa, ee', function (done) {
+		var object = {};
+					012345678901234567890123456789012345678901234567890123456789012345678901234567890;
+		var line = ' \nATOM  16596  N   GLN C 123       8.285  -2.726 -26.326  1.00 43.96           N  \n';
+		var chunk_offset = 2;
+		var line_offset = 0; // next line byte to fetch
+		var auto = atom_auto;
+
+		var result = automaton(object, tc(line), chunk_offset, line_offset, auto);
+
+		result.should.eql({
+			chunk_offset: 82, // last read byte was newline
+			signal: signal.READ_LINE
+		});
+
+		object.should.eql({
+			rec: tc('A'),
+			'_': tc('TOM  ').
+					concat(tc(' ')).concat(tc(' ')).
+					concat(tc('   ')).concat(tc('          ')),
+			serial: tc('16596'),
+			atom_name: tc(' N  '),
+			alt_loc: tc(' '),
+			residue_name: tc('GLN'),
+			chain_id: tc('C'),
+			res_seq: tc(' 123'),
+			i_code: tc(' '),
+			x: tc('   8.285'),
+			y: tc('  -2.726'),
+			z: tc(' -26.326'),
+			occupancy: tc('  1.00'),
+			temp_factor: tc(' 43.96'),
+			element: tc(' N'),
+			charge: tc('  ')
+		});
+
+		done();
+	});
+
+	it('#a < b, sa, ea', function (done) {
+		var object = {};
+					012345678901234567890123456789012345678901234567890123456789012345678901234567890;
+		var line = ' \nATOM  16596  N   GLN C 123       8.285  -2.726 -26.326  1.00 43.96           N  ';
+		var chunk_offset = 2;
+		var line_offset = 0; // next line byte to fetch
+		var auto = atom_auto;
+
+		var result = automaton(object, tc(line), chunk_offset, line_offset, auto);
+
+		result.should.eql({
+			chunk_offset: 81,
+			line_offset: 79,
+			signal: signal.INCOMPLETE_LINE
+		});
+
+		object.should.eql({
+			rec: tc('A'),
+			'_': tc('TOM  ').
+					concat(tc(' ')).concat(tc(' ')).
+					concat(tc('   ')).concat(tc('          ')),
+			serial: tc('16596'),
+			atom_name: tc(' N  '),
+			alt_loc: tc(' '),
+			residue_name: tc('GLN'),
+			chain_id: tc('C'),
+			res_seq: tc(' 123'),
+			i_code: tc(' '),
+			x: tc('   8.285'),
+			y: tc('  -2.726'),
+			z: tc(' -26.326'),
+			occupancy: tc('  1.00'),
+			temp_factor: tc(' 43.96'),
+			element: tc(' N'),
+			charge: tc('  ')
+		});
+
+		// New chunk comes in ...
+		result = automaton(object, tc('\nAT'), 0, 80, atom_auto);
+
+		result.should.eql({
+			chunk_offset: 0,
+			signal: signal.READ_LINE
+		});
+
+		object.should.eql({
+			rec: tc('A'),
+			'_': tc('TOM  ').
+					concat(tc(' ')).concat(tc(' ')).
+					concat(tc('   ')).concat(tc('          ')),
+			serial: tc('16596'),
+			atom_name: tc(' N  '),
+			alt_loc: tc(' '),
+			residue_name: tc('GLN'),
+			chain_id: tc('C'),
+			res_seq: tc(' 123'),
+			i_code: tc(' '),
+			x: tc('   8.285'),
+			y: tc('  -2.726'),
+			z: tc(' -26.326'),
+			occupancy: tc('  1.00'),
+			temp_factor: tc(' 43.96'),
+			element: tc(' N'),
+			charge: tc('  ')
+		});
+
+		done();
+	});
+
+	// a > b tests
 });
