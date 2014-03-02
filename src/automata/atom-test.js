@@ -123,7 +123,7 @@ var ATOMS_TO_RESULTS = [
 
 describe('atom automaton array', function () {
 	// This is a kind of stress test
-	// Various atom, many of them, and all are feed to automaton with auto array
+	// Various atoms, many of them, and all are feed to automaton with atom array
 	// And it should return correct result in all cases
 
 	it('#test', function (done) {

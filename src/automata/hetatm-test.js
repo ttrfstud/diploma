@@ -102,7 +102,7 @@ var ATOMS_TO_RESULTS = [
 
 describe('hetatm automaton array', function () {
 	// This is a kind of stress test
-	// Various atom, many of them, and all are feed to automaton with auto array
+	// Various hetatms, many of them, and all are feed to automaton with hetatm array
 	// And it should return correct result in all cases
 
 	it('#test', function (done) {

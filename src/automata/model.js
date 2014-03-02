@@ -16,7 +16,7 @@ module.exports = [
 /*11 */[union(classes.dec, classes.w), 'model'],
 /*12 */[union(classes.dec, classes.w), 'model'],
 /*13 */[union(classes.dec, classes.w), 'model'],
-/*14 */[union(classes.w), '_'],
+/*14 */[union(classes.dec, classes.w), 'model'],
 /*15 */[union(classes.w), '_'],
 /*16 */[union(classes.w), '_'],
 /*17 */[union(classes.w), '_'],
@@ -53,6 +53,15 @@ module.exports = [
 /*48 */[union(classes.w), '_'],
 /*49 */[union(classes.w), '_'],
 /*50 */[union(classes.w), '_'],
+/*51 */[union(classes.w), '_'],
+/*52 */[union(classes.w), '_'],
+/*53 */[union(classes.w), '_'],
+/*54 */[union(classes.w), '_'],
+/*55 */[union(classes.w), '_'],
+/*56 */[union(classes.w), '_'],
+/*57 */[union(classes.w), '_'],
+/*58 */[union(classes.w), '_'],
+/*59 */[union(classes.w), '_'],
 /*60 */[union(classes.w), '_'],
 /*61 */[union(classes.w), '_'],
 /*62 */[union(classes.w), '_'],
@@ -75,3 +84,5 @@ module.exports = [
 /*79 */[union(classes.w), '_'],
 /*80 */[union(classes.w), '_'],
 ];
+
+module.exports.name = 'model';
