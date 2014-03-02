@@ -10,7 +10,7 @@ exports.arrays_equal = function arrays_equal(a1, a2) {
 	}
 
 	return true;
-}
+};
 
 function zeroify(potential_number) {
 	var zeroed = potential_number - 0x30;
@@ -37,8 +37,22 @@ exports.raw_atom_2_atom = function raw_atom_2_atom(raw_atom) {
 		}
 	}
 
+	for (var i = 0; i < 4; i++) {
+		if (raw_atom.x[i] === 0x2d) {
+			x = 0 - x;
+		}
+
+		if (raw_atom.y[i] === 0x2d) {
+			y = 0 - y;
+		}
+
+		if (raw_atom.z[i] === 0x2d) {
+			z = 0 - z;
+		}
+	}
+
 	return {x: x, y: y, z: z};
-}
+};
 
 exports.init_model = function init_model(model) {
 	if (model >= 10000) {
@@ -62,7 +76,7 @@ exports.init_model = function init_model(model) {
 	}
 
 	return _model;
-}
+};
 
 exports.determine_automaton = function determine_automaton(tree, chunk, i, determination_array) {
 	var _determination_array = determination_array ? determination_array.slice(0) : [];
@@ -90,7 +104,7 @@ exports.determine_automaton = function determine_automaton(tree, chunk, i, deter
 			auto: tree
 		};
 	}
-}
+};
 
 exports.object_concat = function object_concat() {
 	var result = {};
@@ -102,4 +116,12 @@ exports.object_concat = function object_concat() {
 	}
 
 	return result;
-}
+};
+
+exports.safe_prop_append = function safe_prop_append(obj, prop, val) {
+	if (!obj[prop]) {
+		obj[prop] = [];
+	}
+
+	obj[prop].push(val);
+};

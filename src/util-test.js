@@ -21,7 +21,7 @@ describe('util', function () {
 	});
 
 	describe('util.raw_atom_2_atom', function () {
-		// Passes good, but floating distortion ...
+		// These tests pass good, but floating distortion ...
 		it.skip('#retains only x, y, z', function (done) {
 			var raw_atom = {
 				'_': [32,4,56,43,234,56,2,45,6,4],
@@ -34,6 +34,74 @@ describe('util', function () {
 
 			util.raw_atom_2_atom(raw_atom).should.eql({
 				x: 12.240,
+				y: 8004.611,
+				z: 1.235
+			});
+		});		
+
+		it.skip('#retains only x, y, z (|round(x)| = 3, neg)', function (done) {
+			var raw_atom = {
+				'_': [32,4,56,43,234,56,2,45,6,4],
+				'i_code': [33],
+				'serial': [12,34,56,32],
+				'x': [0x2d, 0x31, 0x31, 0x32, 0x2e, 0x32, 0x34, 0x30],
+				'y': [0x38, 0x30, 0x30, 0x34, 0x2e, 0x36, 0x31, 0x31],
+				'z': [0x20, 0x20, 0x20, 0x31, 0x2e, 0x32, 0x33, 0x35]
+			}
+
+			util.raw_atom_2_atom(raw_atom).should.eql({
+				x: -112.240,
+				y: 8004.611,
+				z: 1.235
+			});
+		});
+
+		it.skip('#retains only x, y, z (|round(x)| = 2, neg)', function (done) {
+			var raw_atom = {
+				'_': [32,4,56,43,234,56,2,45,6,4],
+				'i_code': [33],
+				'serial': [12,34,56,32],
+				'x': [0x20, 0x2d, 0x31, 0x32, 0x2e, 0x32, 0x34, 0x30],
+				'y': [0x38, 0x30, 0x30, 0x34, 0x2e, 0x36, 0x31, 0x31],
+				'z': [0x20, 0x20, 0x20, 0x31, 0x2e, 0x32, 0x33, 0x35]
+			}
+
+			util.raw_atom_2_atom(raw_atom).should.eql({
+				x: -12.240,
+				y: 8004.611,
+				z: 1.235
+			});
+		});
+
+		it.skip('#retains only x, y, z (|round(x)| = 1, neg)', function (done) {
+			var raw_atom = {
+				'_': [32,4,56,43,234,56,2,45,6,4],
+				'i_code': [33],
+				'serial': [12,34,56,32],
+				'x': [0x20, 0x20, 0x2d, 0x31, 0x2e, 0x32, 0x34, 0x30],
+				'y': [0x38, 0x30, 0x30, 0x34, 0x2e, 0x36, 0x31, 0x31],
+				'z': [0x20, 0x20, 0x20, 0x31, 0x2e, 0x32, 0x33, 0x35]
+			}
+
+			util.raw_atom_2_atom(raw_atom).should.eql({
+				x: -1.240,
+				y: 8004.611,
+				z: 1.235
+			});
+		});
+
+		it.skip('#retains only x, y, z (|round(x)| = 1 (zero), neg)', function (done) {
+			var raw_atom = {
+				'_': [32,4,56,43,234,56,2,45,6,4],
+				'i_code': [33],
+				'serial': [12,34,56,32],
+				'x': [0x20, 0x20, 0x2d, 0x30, 0x2e, 0x32, 0x34, 0x30],
+				'y': [0x38, 0x30, 0x30, 0x34, 0x2e, 0x36, 0x31, 0x31],
+				'z': [0x20, 0x20, 0x20, 0x31, 0x2e, 0x32, 0x33, 0x35]
+			}
+
+			util.raw_atom_2_atom(raw_atom).should.eql({
+				x: -0.240,
 				y: 8004.611,
 				z: 1.235
 			});
@@ -277,6 +345,25 @@ describe('util', function () {
 				b: 4,
 				c: 5
 			});
+
+			done();
+		});
+	});
+
+	describe('util.safe_prop_append', function () {
+		it('#existing prop', function (done) {
+			var obj = {'test_prop': [0]};
+			util.safe_prop_append(obj, 'test_prop', 0);
+			obj.test_prop.should.eql([0, 0]);
+
+			done();
+		});
+
+		it('#non-existing prop', function (done) {
+			var obj = {};
+			obj.should.not.have.ownProperty('test_prop');
+			util.safe_prop_append(obj, 'test_prop', 10);
+			obj.test_prop.should.eql([10]);
 
 			done();
 		});
