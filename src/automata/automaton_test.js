@@ -59,7 +59,7 @@ describe('automaton', function () {
 	// -- sa, ee (impossible)
 	// -- sa, ea
 	// =>
-	// a = b => sb, eb | se, ee | sa, ea
+	// a = b => sb, eb (v)| se, ee | sa, ea
 	// 2. a < b
 	// -- sb, eb (cm, sb, neo) <--- same as a = b, sb, eb, but a sub-case!
 	// -- sb, ee (impossible)
@@ -86,12 +86,51 @@ describe('automaton', function () {
 	// a > b => sb, eb | sb, ee | sb, ea | se, ea | sa, ea
 
 	// a = b here means: |a| = 80 & b = |81|
-	// a < b here means: |a| = 79 & b = |81|
+	// a < b here means: |a| = 80 & b = |82|
 	// a > b here means: |a| = 80 & b = |80}
 	it('#a = b, sb, eb', function (done) {
+		var object = {rec: ['A'.charCodeAt(0)], '_': ['T'.charCodeAt(0)]};
+					12345678901234567890123456789012345678901234567890123456789012345678901234567890;
+		var line = 'OM  16596  N   GLN C 123       8.285  -2.726 -26.326  1.00 43.96           N  \nAT';
+		var chunk_offset = 0;
+		var line_offset = 2;
+		var auto = atom_auto;
+
+		var result = automaton(object, tc(line), chunk_offset, line_offset, auto);
+
+		result.should.eql({
+			chunk_offset: 78, // last read byte was newline
+			signal: signal.READ_LINE
+		});
+
+		object.should.eql({
+			rec: tc('A'),
+			'_': tc('TOM  ').
+					concat(tc(' ')).concat(tc(' ')).
+					concat(tc('   ')).concat(tc('          ')),
+			serial: tc('16596'),
+			atom_name: tc(' N  '),
+			alt_loc: tc(' '),
+			residue_name: tc('GLN'),
+			chain_id: tc('C'),
+			res_seq: tc(' 123'),
+			i_code: tc(' '),
+			x: tc('   8.285'),
+			y: tc('  -2.726'),
+			z: tc(' -26.326'),
+			occupancy: tc('  1.00'),
+			temp_factor: tc(' 43.96'),
+			element: tc(' N'),
+			charge: tc('  ')
+		});
+
+		done();
+	});	
+
+	it('#a = b, se, ee', function (done) {
 		var object = {};
 					12345678901234567890123456789012345678901234567890123456789012345678901234567890;
-		var line = 'ATOM  16596  N   GLN C 123       8.285  -2.726 -26.326  1.00 43.96           N  \nAT';
+		var line = 'ATOM  16596  N   GLN C 123       8.285  -2.726 -26.326  1.00 43.96           N  \n';
 		var chunk_offset = 0;
 		var line_offset = 0;
 		var auto = atom_auto;
@@ -99,7 +138,7 @@ describe('automaton', function () {
 		var result = automaton(object, tc(line), chunk_offset, line_offset, auto);
 
 		result.should.eql({
-			chunk_offset: 80, // because we read with newline, but skipped it
+			chunk_offset: 80, // last read byte was newline
 			signal: signal.READ_LINE
 		});
 
@@ -127,58 +166,20 @@ describe('automaton', function () {
 		done();
 	});
 	
-	it('#ce - se - eo - ne', function (done) {
+
+	it('#a = b, sa, ea', function (done) {
 		var object = {};
 					12345678901234567890123456789012345678901234567890123456789012345678901234567890;
-		var line = 'ATOM  16596  N   GLN C 123       8.285  -2.726 -26.326  1.00 43.96           N  \n';
-		var chunk_offset = 0;
+		var line = '  \nATOM  16596  N   GLN C 123       8.285  -2.726 -26.326  1.00 43.96           N';
+		var chunk_offset = 3;
 		var line_offset = 0;
 		var auto = atom_auto;
 
 		var result = automaton(object, tc(line), chunk_offset, line_offset, auto);
 
 		result.should.eql({
-			chunk_offset: 80,
-			signal: signal.READ_LINE
-		});
-
-		object.should.eql({
-			rec: tc('A'),
-			'_': tc('TOM  ').
-					concat(tc(' ')).concat(tc(' ')).
-					concat(tc('   ')).concat(tc('          ')),
-			serial: tc('16596'),
-			atom_name: tc(' N  '),
-			alt_loc: tc(' '),
-			residue_name: tc('GLN'),
-			chain_id: tc('C'),
-			res_seq: tc(' 123'),
-			i_code: tc(' '),
-			x: tc('   8.285'),
-			y: tc('  -2.726'),
-			z: tc(' -26.326'),
-			occupancy: tc('  1.00'),
-			temp_factor: tc(' 43.96'),
-			element: tc(' N'),
-			charge: tc('  ')
-		});
-
-		done();
-	});
-
-	it('#cl - se - eo - ne', function (done) {
-		var object = {};
-					12345678901234567890123456789012345678901234567890123456789012345678901234567890;
-		var line = 'ATOM  16596  N   GLN C 123       8.285  -2.726 -26.326  1.00 43.96           N  ';
-		var chunk_offset = 0;
-		var line_offset = 0;
-		var auto = atom_auto;
-
-		var result = automaton(object, tc(line), chunk_offset, line_offset, auto);
-
-		result.should.eql({
-			line_offset: 79,
-			chunk_offset: 79,
+			chunk_offset: 80, // last read byte was newline
+			line_offset: 77,
 			signal: signal.INCOMPLETE_LINE
 		});
 
@@ -199,14 +200,14 @@ describe('automaton', function () {
 			z: tc(' -26.326'),
 			occupancy: tc('  1.00'),
 			temp_factor: tc(' 43.96'),
-			element: tc(' N'),
-			charge: tc('  ')
+			element: tc(' N')
 		});
 
-		result = automaton(object, tc('\nATOM  '), 0, 80, auto);
+		// Test continues, we want to read to the end. New chunk comes in
+		var result = automaton(object, tc('  \nA'), 0, 78, auto);
 
 		result.should.eql({
-			chunk_offset: 0,
+			chunk_offset: 2, // last read byte was newline
 			signal: signal.READ_LINE
 		});
 
@@ -233,17 +234,163 @@ describe('automaton', function () {
 
 		done();
 	});
-	// cm - sb - neo - ne
-	// ce - sb - neo - ne
-	// cl - sb - neo - ne
+	
+	// it('#ce - se - eo - ne', function (done) {
+	// 	var object = {};
+	// 				12345678901234567890123456789012345678901234567890123456789012345678901234567890;
+	// 	var line = 'ATOM  16596  N   GLN C 123       8.285  -2.726 -26.326  1.00 43.96           N  \n';
+	// 	var chunk_offset = 0;
+	// 	var line_offset = 0;
+	// 	var auto = atom_auto;
 
-	// cm - sa - eo - ne
-	// ce - sa - eo - ne
-	// cl
-	it('#cm - sb - neo - ne', function (done) {
+	// 	var result = automaton(object, tc(line), chunk_offset, line_offset, auto);
+
+	// 	result.should.eql({
+	// 		chunk_offset: 80,
+	// 		signal: signal.READ_LINE
+	// 	});
+
+	// 	object.should.eql({
+	// 		rec: tc('A'),
+	// 		'_': tc('TOM  ').
+	// 				concat(tc(' ')).concat(tc(' ')).
+	// 				concat(tc('   ')).concat(tc('          ')),
+	// 		serial: tc('16596'),
+	// 		atom_name: tc(' N  '),
+	// 		alt_loc: tc(' '),
+	// 		residue_name: tc('GLN'),
+	// 		chain_id: tc('C'),
+	// 		res_seq: tc(' 123'),
+	// 		i_code: tc(' '),
+	// 		x: tc('   8.285'),
+	// 		y: tc('  -2.726'),
+	// 		z: tc(' -26.326'),
+	// 		occupancy: tc('  1.00'),
+	// 		temp_factor: tc(' 43.96'),
+	// 		element: tc(' N'),
+	// 		charge: tc('  ')
+	// 	});
+
+	// 	done();
+	// });
+
+	// it('#cl - se - eo - ne', function (done) {
+	// 	var object = {};
+	// 				12345678901234567890123456789012345678901234567890123456789012345678901234567890;
+	// 	var line = 'ATOM  16596  N   GLN C 123       8.285  -2.726 -26.326  1.00 43.96           N  ';
+	// 	var chunk_offset = 0;
+	// 	var line_offset = 0;
+	// 	var auto = atom_auto;
+
+	// 	var result = automaton(object, tc(line), chunk_offset, line_offset, auto);
+
+	// 	result.should.eql({
+	// 		line_offset: 79,
+	// 		chunk_offset: 79,
+	// 		signal: signal.INCOMPLETE_LINE
+	// 	});
+
+	// 	object.should.eql({
+	// 		rec: tc('A'),
+	// 		'_': tc('TOM  ').
+	// 				concat(tc(' ')).concat(tc(' ')).
+	// 				concat(tc('   ')).concat(tc('          ')),
+	// 		serial: tc('16596'),
+	// 		atom_name: tc(' N  '),
+	// 		alt_loc: tc(' '),
+	// 		residue_name: tc('GLN'),
+	// 		chain_id: tc('C'),
+	// 		res_seq: tc(' 123'),
+	// 		i_code: tc(' '),
+	// 		x: tc('   8.285'),
+	// 		y: tc('  -2.726'),
+	// 		z: tc(' -26.326'),
+	// 		occupancy: tc('  1.00'),
+	// 		temp_factor: tc(' 43.96'),
+	// 		element: tc(' N'),
+	// 		charge: tc('  ')
+	// 	});
+
+	// 	result = automaton(object, tc('\nATOM  '), 0, 80, auto);
+
+	// 	result.should.eql({
+	// 		chunk_offset: 0,
+	// 		signal: signal.READ_LINE
+	// 	});
+
+	// 	object.should.eql({
+	// 		rec: tc('A'),
+	// 		'_': tc('TOM  ').
+	// 				concat(tc(' ')).concat(tc(' ')).
+	// 				concat(tc('   ')).concat(tc('          ')),
+	// 		serial: tc('16596'),
+	// 		atom_name: tc(' N  '),
+	// 		alt_loc: tc(' '),
+	// 		residue_name: tc('GLN'),
+	// 		chain_id: tc('C'),
+	// 		res_seq: tc(' 123'),
+	// 		i_code: tc(' '),
+	// 		x: tc('   8.285'),
+	// 		y: tc('  -2.726'),
+	// 		z: tc(' -26.326'),
+	// 		occupancy: tc('  1.00'),
+	// 		temp_factor: tc(' 43.96'),
+	// 		element: tc(' N'),
+	// 		charge: tc('  ')
+	// 	});
+
+	// 	done();
+	// });
+	// // cm - sb - neo - ne
+	// // ce - sb - neo - ne
+	// // cl - sb - neo - ne
+
+	// // cm - sa - eo - ne
+	// // ce - sa - eo - ne
+	// // cl
+	// it('#cm - sb - neo - ne', function (done) {
+	// 	var object = {};
+	// 				12345678901234567890123456789012345678901234567890123456789012345678901234567890;
+	// 	var line = 'ATOM  16596  N   GLN C 123       8.285  -2.726 -26.326  1.00 43.96           N  \n';
+	// 	var chunk_offset = 0;
+	// 	var line_offset = 0;
+	// 	var auto = atom_auto;
+
+	// 	var result = automaton(object, tc(line), chunk_offset, line_offset, auto);
+
+	// 	result.should.eql({
+	// 		chunk_offset: 80,
+	// 		signal: signal.READ_LINE
+	// 	});
+
+	// 	object.should.eql({
+	// 		rec: tc('A'),
+	// 		'_': tc('TOM  ').
+	// 				concat(tc(' ')).concat(tc(' ')).
+	// 				concat(tc('   ')).concat(tc('          ')),
+	// 		serial: tc('16596'),
+	// 		atom_name: tc(' N  '),
+	// 		alt_loc: tc(' '),
+	// 		residue_name: tc('GLN'),
+	// 		chain_id: tc('C'),
+	// 		res_seq: tc(' 123'),
+	// 		i_code: tc(' '),
+	// 		x: tc('   8.285'),
+	// 		y: tc('  -2.726'),
+	// 		z: tc(' -26.326'),
+	// 		occupancy: tc('  1.00'),
+	// 		temp_factor: tc(' 43.96'),
+	// 		element: tc(' N'),
+	// 		charge: tc('  ')
+	// 	});
+
+	// 	done();
+	// });
+
+	it('example', function (done) {
 		var object = {};
 					12345678901234567890123456789012345678901234567890123456789012345678901234567890;
-		var line = 'ATOM  16596  N   GLN C 123       8.285  -2.726 -26.326  1.00 43.96           N  \n';
+		var line = 'ATOM  16596  N   GLN C 123       8.285  -2.726 -26.326  1.00 43.96           N  \nAT';
 		var chunk_offset = 0;
 		var line_offset = 0;
 		var auto = atom_auto;
@@ -251,7 +398,7 @@ describe('automaton', function () {
 		var result = automaton(object, tc(line), chunk_offset, line_offset, auto);
 
 		result.should.eql({
-			chunk_offset: 80,
+			chunk_offset: 80, // because we read with newline, but skipped it
 			signal: signal.READ_LINE
 		});
 
