@@ -237,4 +237,48 @@ describe('util', function () {
 			done();
 		});
 	});
+
+	describe('util.object_concat', function () {
+		it('#two objects', function (done) {
+			var obj =  {a: 1};
+			var obj2 = {b: 2};
+
+			util.object_concat(obj, obj2).should.eql({
+				a: 1,
+				b: 2
+			});
+
+			done();
+		});
+
+		it('#four objects', function (done) {
+			var obj =  {a: 1};
+			var obj2 = {b: 2};
+			var obj3 = {c: 3};
+			var obj4 = {d: 4};
+
+			util.object_concat(obj, obj2, obj3, obj4).should.eql({
+				a: 1,
+				b: 2,
+				c: 3,
+				d: 4
+			});
+
+			done();
+		});
+
+		it('#next"s props override prev"s', function (done) {
+			var obj = {a: 1};
+			var obj2 = {a: 2, b: 3};
+			var obj3 = {b: 4, c: 5};
+
+			util.object_concat(obj, obj2, obj3).should.eql({
+				a: 2,
+				b: 4,
+				c: 5
+			});
+
+			done();
+		});
+	});
 })

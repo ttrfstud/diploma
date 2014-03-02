@@ -1,4 +1,6 @@
-var skip = require('./skip');
+var skip        = require('./skip');
+var atom_hetatm = require('./atom_hetatm');
+var model       = require('./model');
 
 module.exports = {
 	H: {
@@ -11,9 +13,9 @@ module.exports = {
 				}
 			},
 			T: {
-				'_': {
-					'_': {
-						'_': skip
+				' ': {
+					' ': {
+						' ': skip
 					},
 				},
 				N: {
@@ -35,7 +37,7 @@ module.exports = {
 			L: {
 				I: {
 					X: {
-						'_': skip
+						' ': skip
 					}
 				}
 			}
@@ -70,16 +72,16 @@ module.exports = {
 			T: {
 				L: {
 					E: {
-						'_': skip
+						' ': skip
 					}
 				}
 			}
-		}
+		},
 		E: {
 			R: {
-				'_': {
-					'_': {
-						'_': skip
+				' ': {
+					' ': {
+						' ': skip
 					}
 				}
 			}
@@ -91,7 +93,7 @@ module.exports = {
 			L: {
 				I: {
 					T: {
-						'_': skip
+						' ': skip
 					}
 				}
 			},
@@ -130,7 +132,7 @@ module.exports = {
 			E: {
 				E: {
 					T: {
-						'_': skip
+						' ': skip
 					}
 				}
 			}
@@ -147,8 +149,8 @@ module.exports = {
 		I: {
 			T: {
 				E: {
-					'_': {
-						'_': skip
+					' ': {
+						' ': skip
 					}
 				}
 			}
@@ -238,11 +240,11 @@ module.exports = {
 					D: {
 						L: skip
 					}
-				}
-			},
-			'_': {
-				'_': {
-					'_': skip
+				},
+				' ': {
+					' ': {
+						' ': skip
+					}
 				}
 			}
 		}
@@ -269,15 +271,6 @@ module.exports = {
 				}
 			}
 		},
-		O: {
-			D: {
-				R: {
-					E: {
-						S: skip
-					}
-				}
-			}
-		},
 		T: {
 			R: {
 				I: {
@@ -291,9 +284,14 @@ module.exports = {
 		},
 		O: {
 			D: {
+				R: {
+					E: {
+						S: skip
+					}
+				},
 				E: {
 					L: {
-						'_': model
+						' ': model
 					}
 				}
 			}
@@ -322,8 +320,8 @@ module.exports = {
 		T: {
 			O: {
 				M: {
-					'_': {
-						'_': atom_hetatm
+					' ': {
+						' ': atom_hetatm
 					}
 				}
 			}
@@ -361,8 +359,8 @@ module.exports = {
 		R: {
 			N: {
 				L: {
-					'_': {
-						'_': skip
+					' ': {
+						' ': skip
 					}
 				}
 			}
@@ -373,7 +371,7 @@ module.exports = {
 			R: {
 				E: {
 					F: {
-						'_': skip
+						' ': skip
 					}
 				}
 			}
@@ -394,8 +392,8 @@ module.exports = {
 		I: {
 			N: {
 				K: {
-					'_': {
-						'_': skip
+					' ': {
+						' ': skip
 					}
 				}
 			}

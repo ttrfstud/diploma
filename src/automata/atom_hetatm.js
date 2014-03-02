@@ -1,84 +1,86 @@
+
+var union   = require('../util').object_concat;
 var classes = require('./classes');
 
 module.exports = [
-/* 1 */[classes.a.concat(classes.h), 'rec'], /* 'ATOM  ' */
-/* 2 */[classes.t.concat(classes.e), '_'],
-/* 3 */[classes.o.concat(classes.t), '_'],
-/* 4 */[classes.m.concat(classes.a), '_'],
-/* 5 */[classes.w.concat(classes.t), '_'],
-/* 6 */[classes.w.concat(classes.m), '_'],
-/* 7 */[classes.dec.concat(classes.w), 'serial'], /* serial */
-/* 8 */[classes.dec.concat(classes.w), 'serial'], 
-/* 9 */[classes.dec.concat(classes.w), 'serial'],  
-/*10 */[classes.dec.concat(classes.w), 'serial'],  
-/*11 */[classes.dec, 'serial'],  
-/*12 */[classes.w, '_'], /* ws */
-/*13 */[classes.an.concat(classes.dec).concat(classes.w), 'atom_name'], /* atom name */
-/*14 */[classes.an.concat(classes.dec), 'atom_name'],
-/*15 */[classes.an.concat(classes.dec).concat(classes.w), 'atom_name'],
-/*16 */[classes.an.concat(classes.dec).concat(classes.w), 'atom_name'],
-/*17 */[classes.an.concat(classes.w), 'alt_loc'], /* alt_loc */
-/*18 */[classes.an.concat(classes.w), 'residue_name'], /* residue_name */
-/*19 */[classes.an.concat(classes.w), 'residue_name'], 
-/*20 */[classes.an, 'residue_name'], 
-/*21 */[classes.w, '_'], 
-/*22 */[classes.an.concat(classes.w), 'chain_id'], /* chain_id */
-/*23 */[classes.dec.concat(classes.w), 'res_seq'], /* res_seq */
-/*24 */[classes.dec.concat(classes.w), 'res_seq'], 
-/*25 */[classes.dec.concat(classes.w), 'res_seq'], 
-/*26 */[classes.dec.concat(classes.w), 'res_seq'], 
-/*27 */[classes.an.concat(classes.w), 'i_code'], /* i_code */
-/*28 */[classes.w, '_'], /* ws 28-30 */
-/*29 */[classes.w, '_'],
-/*30 */[classes.w, '_'],
-/*31 */[classes.dec.concat(classes.w), 'x'], /* x */
-/*32 */[classes.dec.concat(classes.w), 'x'],
-/*33 */[classes.dec.concat(classes.w), 'x'],
-/*34 */[classes.dec, 'x'],
-/*35 */[classes.dot, 'x'],
-/*36 */[classes.dec, 'x'],
-/*37 */[classes.dec, 'x'],
-/*38 */[classes.dec, 'x'],
-/*39 */[classes.dec.concat(classes.w), 'y'], /* y */
-/*40 */[classes.dec.concat(classes.w), 'y'],
-/*41 */[classes.dec.concat(classes.w), 'y'],
-/*42 */[classes.dec, 'y'],
-/*43 */[classes.dot, 'y'],
-/*44 */[classes.dec, 'y'],
-/*45 */[classes.dec, 'y'],
-/*46 */[classes.dec, 'y'],
-/*47 */[classes.dec.concat(classes.w), 'z'], /* z */
-/*48 */[classes.dec.concat(classes.w), 'z'],
-/*49 */[classes.dec.concat(classes.w), 'z'],
-/*50 */[classes.dec.concat(classes.dot), 'z'],
-/*51 */[classes.dot, 'z'],
-/*52 */[classes.dec, 'z'],
-/*53 */[classes.dec, 'z'],
-/*54 */[classes.dec, 'z'],
-/*55 */[classes.dec.concat(classes.w), 'occupancy'], /* occupancy */
-/*56 */[classes.dec.concat(classes.w), 'occupancy'],
-/*57 */[classes.dec.concat(classes.dot), 'occupancy'],
-/*58 */[classes.dot, 'occupancy'],
-/*59 */[classes.dec, 'occupancy'],
-/*60 */[classes.dec, 'occupancy'],
-/*61 */[classes.dec.concat(classes.w), 'temp_factor'], /* temp_factor */
-/*62 */[classes.dec.concat(classes.w), 'temp_factor'],
-/*63 */[classes.dec, 'temp_factor'],
-/*64 */[classes.dot, 'temp_factor'],
-/*65 */[classes.dec, 'temp_factor'],
-/*66 */[classes.dec, 'temp_factor'],
-/*67 */[classes.w, '_'], /* ws 67 - 76 */
-/*68 */[classes.w, '_'], 
-/*69 */[classes.w, '_'], 
-/*70 */[classes.w, '_'], 
-/*71 */[classes.w, '_'], 
-/*72 */[classes.w, '_'], 
-/*73 */[classes.w, '_'], 
-/*74 */[classes.w, '_'], 
-/*75 */[classes.w, '_'], 
-/*76 */[classes.w, '_'], 
-/*77 */[classes.an.concat(classes.w), 'element'], /* element */
-/*78 */[classes.an, 'element'],
-/*79 */[classes.w.concat(classes.plus_minus).concat(classes.dec), 'charge'], /* charge */
-/*80 */[classes.w.concat(classes.plus_minus).concat(classes.dec), 'charge']
+/* 1 */[union(classes.a, classes.h), 'rec'], /* 'ATOM  ' */
+/* 2 */[union(classes.t, classes.e), '_'],
+/* 3 */[union(classes.o, classes.t), '_'],
+/* 4 */[union(classes.m, classes.a), '_'],
+/* 5 */[union(classes.w, classes.t), '_'],
+/* 6 */[union(classes.w, classes.m), '_'],
+/* 7 */[union(classes.dec, classes.w), 'serial'], /* serial */
+/* 8 */[union(classes.dec, classes.w), 'serial'], 
+/* 9 */[union(classes.dec, classes.w), 'serial'],  
+/*10 */[union(classes.dec, classes.w), 'serial'],  
+/*11 */[union(classes.dec), 'serial'],  
+/*12 */[union(classes.w), '_'], /* ws */
+/*13 */[union(classes.an, classes.dec, classes.w), 'atom_name'], /* atom name */
+/*14 */[union(classes.an, classes.dec), 'atom_name'],
+/*15 */[union(classes.an, classes.dec, classes.w), 'atom_name'],
+/*16 */[union(classes.an, classes.dec, classes.w), 'atom_name'],
+/*17 */[union(classes.an, classes.w), 'alt_loc'], /* alt_loc */
+/*18 */[union(classes.an, classes.w), 'residue_name'], /* residue_name */
+/*19 */[union(classes.an, classes.w), 'residue_name'], 
+/*20 */[union(classes.an), 'residue_name'], 
+/*21 */[union(classes.w), '_'], 
+/*22 */[union(classes.an, classes.w), 'chain_id'], /* chain_id */
+/*23 */[union(classes.dec, classes.w), 'res_seq'], /* res_seq */
+/*24 */[union(classes.dec, classes.w), 'res_seq'], 
+/*25 */[union(classes.dec, classes.w), 'res_seq'], 
+/*26 */[union(classes.dec, classes.w), 'res_seq'], 
+/*27 */[union(classes.an, classes.w), 'i_code'], /* i_code */
+/*28 */[union(classes.w), '_'], /* ws 28-30 */
+/*29 */[union(classes.w), '_'],
+/*30 */[union(classes.w), '_'],
+/*31 */[union(classes.dec, classes.w), 'x'], /* x */
+/*32 */[union(classes.dec, classes.w), 'x'],
+/*33 */[union(classes.dec, classes.w), 'x'],
+/*34 */[union(classes.dec), 'x'],
+/*35 */[union(classes.dot), 'x'],
+/*36 */[union(classes.dec), 'x'],
+/*37 */[union(classes.dec), 'x'],
+/*38 */[union(classes.dec), 'x'],
+/*39 */[union(classes.dec, classes.w), 'y'], /* y */
+/*40 */[union(classes.dec, classes.w), 'y'],
+/*41 */[union(classes.dec, classes.w), 'y'],
+/*42 */[union(classes.dec), 'y'],
+/*43 */[union(classes.dot), 'y'],
+/*44 */[union(classes.dec), 'y'],
+/*45 */[union(classes.dec), 'y'],
+/*46 */[union(classes.dec), 'y'],
+/*47 */[union(classes.dec, classes.w), 'z'], /* z */
+/*48 */[union(classes.dec, classes.w), 'z'],
+/*49 */[union(classes.dec, classes.w), 'z'],
+/*50 */[union(classes.dec), 'z'],
+/*51 */[union(classes.dot), 'z'],
+/*52 */[union(classes.dec), 'z'],
+/*53 */[union(classes.dec), 'z'],
+/*54 */[union(classes.dec), 'z'],
+/*55 */[union(classes.dec, classes.w), 'occupancy'], /* occupancy */
+/*56 */[union(classes.dec, classes.w), 'occupancy'],
+/*57 */[union(classes.dec, classes.dot), 'occupancy'],
+/*58 */[union(classes.dot), 'occupancy'],
+/*59 */[union(classes.dec), 'occupancy'],
+/*60 */[union(classes.dec), 'occupancy'],
+/*61 */[union(classes.dec, classes.w), 'temp_factor'], /* temp_factor */
+/*62 */[union(classes.dec, classes.w), 'temp_factor'],
+/*63 */[union(classes.dec), 'temp_factor'],
+/*64 */[union(classes.dot), 'temp_factor'],
+/*65 */[union(classes.dec), 'temp_factor'],
+/*66 */[union(classes.dec), 'temp_factor'],
+/*67 */[union(classes.w), '_'], /* ws 67 - 76 */
+/*68 */[union(classes.w), '_'], 
+/*69 */[union(classes.w), '_'], 
+/*70 */[union(classes.w), '_'], 
+/*71 */[union(classes.w), '_'], 
+/*72 */[union(classes.w), '_'], 
+/*73 */[union(classes.w), '_'], 
+/*74 */[union(classes.w), '_'], 
+/*75 */[union(classes.w), '_'], 
+/*76 */[union(classes.w), '_'], 
+/*77 */[union(classes.an, classes.w), 'element'], /* element */
+/*78 */[union(classes.an), 'element'],
+/*79 */[union(classes.w, classes.plus_minus, classes.dec), 'charge'], /* charge */
+/*80 */[union(classes.w, classes.plus_minus, classes.dec), 'charge']
  ];

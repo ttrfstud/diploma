@@ -1,6 +1,16 @@
 var signals = require('./signals');
 
 module.exports = function automaton (object, chunk, chunk_offset, line_offset, auto) {
+	// if it is a skip automaton, well, skip!
+	if (!auto) {
+		chunk_offset += 80 - line_offset;
+
+		return {
+			chunk_offset: i,
+			signal: signal.READ_LINE
+		};
+	}
+
 	for (var i = chunk_offset, i < chunk.length; i++, line_offset++) {
 		if (!auto[line_offset]) {
 			// there can only be one case when there is no value for the line_offset

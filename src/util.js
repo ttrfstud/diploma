@@ -91,3 +91,15 @@ exports.determine_automaton = function determine_automaton(tree, chunk, i, deter
 		};
 	}
 }
+
+exports.object_concat = function object_concat() {
+	var result = {};
+
+	for (var i = 0; i < arguments.length; i++) {
+		for (var j in arguments[i]) if (arguments[i].hasOwnProperty(j)) {
+			result[j] = arguments[i][j];
+		}
+	}
+
+	return result;
+}
