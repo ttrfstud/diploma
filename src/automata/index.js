@@ -19,13 +19,13 @@ reader.prototype.on = function (record, listener) {
 reader.prototype.read_more = function (chunk) {
 	var decision;
 
-	for (var i = 0; i < chunk.length; i++, line_offset++) {
+	for (var i = 0; i < chunk.length; i++, this.line_offset++) {
 		if (this.line_offset === 0) {
 			if (this.current_auto) {
 				throw new Error('State error: current automaton is not reset on the new line!');
 			}
 
-			decision = determine_automaton(chunk, i, null);
+			decision = determine_automaton(tree, chunk, i, null);
 
 			if (decision.auto) {
 				this.current_auto = decision.auto;
@@ -34,7 +34,7 @@ reader.prototype.read_more = function (chunk) {
 				i += 5;
 			} else {
 				this.determination_array = decision.determination_array;
-				this.line_offset = decision.determination_array.length + 1;
+				this.line_offset = decision.determination_array.length;
 				break;
 			}
 
@@ -45,7 +45,7 @@ reader.prototype.read_more = function (chunk) {
 			if (this.current_auto) {
 				throw new Error('State error: Current automaton is set, while determination array is not empty!');
 			}
-			decision = determine_automaton(chunk, i, this.determination_array);
+			decision = determine_automaton(tree, chunk, i, this.determination_array);
 
 			if (decision.auto) {
 				this.current_auto = auto;
@@ -74,7 +74,7 @@ reader.prototype.read_more = function (chunk) {
 					break;
 				case signals.INCOMPLETE_LINE:
 					if (decision.chunk_offset < chunk.length) {
-						throw new Error('State error: INCOMPLETE_LINE signal returned while the chunk is now fully read');
+						throw new Error('State error: INCOMPLETE_LINE signal returned while the chunk is not fully read');
 					}
 
 					this.line_offset = decision.line_offset;
@@ -94,3 +94,5 @@ reader.prototype.read_more = function (chunk) {
 		}
 	}
 };
+
+module.exports = reader;

@@ -2,7 +2,18 @@ var automata_tree = require('./automata_tree');
 var should = require('should');
 
 describe('automata_tree', function () {
+	var tc = function (string) {
+		var arr = [];
+
+		for (var i = 0; i < string.length; i++) {
+			arr.push(string.charCodeAt(i));
+		}
+
+		return arr;
+	};
+
 	var allowed = function allowed (word, tree) {
+		word = tc(word);
 		var walk_len = 0;
 		var i = 0;
 		while(tree = tree[word[i++]]) { walk_len++; };
@@ -35,7 +46,6 @@ describe('automata_tree', function () {
 		allowed('CONECT', automata_tree);
 		allowed('CISPEP', automata_tree);
 		allowed('CRYST1', automata_tree);
-		allowed('CRYST1', automata_tree);
 		allowed('KEYWDS', automata_tree);
 		allowed('EXPDTA', automata_tree);
 		allowed('ENDMDL', automata_tree);
@@ -64,11 +74,15 @@ describe('automata_tree', function () {
 	it('#actual automata', function (done) {
 		var tree = automata_tree;
 
-		tree['A']['T']['O']['M'][' '][' '].should.be.instanceof(Array);
-		tree['H']['E']['T']['A']['T']['M'].should.be.instanceof(Array);
-		tree['M']['O']['D']['E']['L'][' '].should.be.instanceof(Array);
-		tree['E']['N']['D']['M']['D']['L'].should.be.instanceof(Array);
+		tree[0x41][0x54][0x4f][0x4d][0x20][0x20].should.be.instanceof(Array);
+		tree[0x41][0x54][0x4f][0x4d][0x20][0x20].length.should.not.equal(0);
+		tree[0x48][0x45][0x54][0x41][0x54][0x4d].should.be.instanceof(Array);
+		tree[0x48][0x45][0x54][0x41][0x54][0x4d].length.should.not.equal(0);
+		tree[0x4d][0x4f][0x44][0x45][0x4c][0x20].should.be.instanceof(Array);
+		tree[0x4d][0x4f][0x44][0x45][0x4c][0x20].length.should.not.equal(0);
+		tree[0x45][0x4e][0x44][0x4d][0x44][0x4c].should.be.instanceof(Array);
+		tree[0x45][0x4e][0x44][0x4d][0x44][0x4c].length.should.not.equal(0);
 
-		done();
+		done();																	
 	})
 });

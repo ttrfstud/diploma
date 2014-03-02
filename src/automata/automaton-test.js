@@ -1,7 +1,7 @@
 var automaton = require('./automaton');
 var signal    = require('./signals');
 var should    = require('should');
-var atom_auto = require('./atom_hetatm');
+var atom_auto = require('./atom');
 var classes   = require('./classes');
 var union     = require('../util').object_concat;
 
@@ -19,7 +19,7 @@ describe('automaton', function () {
 
 	// it is following the automaton array via chunk
 	it('#skip automaton', function (done) {
-		automaton('whatever', 'whatever as well', 30, 50, -1).should.eql({
+		automaton('whatever', 'whatever as well', 30, 50, []).should.eql({
 			chunk_offset: 59, // last traversed, not next to traverse!
 			signal: signal.READ_LINE
 		});

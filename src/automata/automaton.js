@@ -3,7 +3,7 @@ var safe_prop_append = require('../util').safe_prop_append;
 
 module.exports = function automaton (object, chunk, chunk_offset, line_offset, auto) {
 	// if it is a skip automaton, well, skip!
-	if (auto === -1) {
+	if (Array.isArray(auto) && auto.length === 0) {
 		chunk_offset += 79 - line_offset;
 
 		return {
