@@ -84,3 +84,5 @@ module.exports = [
 /*79 */[union(classes.w, classes.plus, classes.minus, classes.dec), 'charge'], /* charge */
 /*80 */[union(classes.w, classes.plus, classes.minus, classes.dec), 'charge']
  ];
+
+ module.exports.name = 'atom';

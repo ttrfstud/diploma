@@ -2,6 +2,8 @@ var automaton = require('./automaton');
 var signal    = require('./signals');
 var should    = require('should');
 var atom_auto = require('./atom_hetatm');
+var classes   = require('./classes');
+var union     = require('../util').object_concat;
 
 // automaton processor should return the offset of the last traversed symbol
 describe('automaton', function () {
@@ -817,6 +819,54 @@ describe('automaton', function () {
 			temp_factor: tc(' 43.96'),
 			element: tc(' N'),
 			charge: tc('  ')
+		});
+
+		done();
+	});
+
+	// There are two obvious errors that can happen inside automaton processor
+	// 1. Automaton array is broken and does not contain a mapping for an offset
+	// 2. Chunk is broken and contains a character not belonging to a character class
+	// described by automaton array at that offset
+
+	it('#error1', function (done) {
+		// Testing this error condition on the previous test, by breaking automaton array at offset 35,
+		// and restoring it after test
+	
+		atom_auto[35] = null;
+
+		try {
+			var object = {};
+						012345678901234567890123456789012345678901234567890123456789012345678901234567890;
+			var line = '  \nATOM  16596  N   GLN C 123       8.285  -2.726 -26.326  1.00 43.96          ';
+			var chunk_offset = 3;
+			var line_offset = 0; // next line byte to fetch
+			var auto = atom_auto;
+			
+			(function () {
+				automaton(object, tc(line), chunk_offset, line_offset, auto);
+			}).should.throw('State error: no value in automaton array in the middle of string: automaton name: atom, offset: 35!');
+		} finally {
+			atom_auto[35] = [union(classes.dec), 'x'];
+		}
+
+		done();
+	});
+
+	it('#error2', function (done) {
+		// Testing this error condition on the previous test as well, by breaking a line and adding 'a' into the middle of x
+		// and restoring it after test
+		var object = {};
+					012345678901234567890123456789012345678901234567890123456789012345678901234567890;
+		var line = '  \nATOM  16596  N   GLN C 123       8A285  -2.726 -26.326  1.00 43.96          ';
+		var chunk_offset = 3;
+		var line_offset = 0; // next line byte to fetch
+		var auto = atom_auto;
+		
+		var result = automaton(object, tc(line), chunk_offset, line_offset, auto);
+
+		result.should.eql({
+			signal: signal.WRONG
 		});
 
 		done();

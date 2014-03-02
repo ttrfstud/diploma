@@ -18,7 +18,7 @@ module.exports = function automaton (object, chunk, chunk_offset, line_offset, a
 			// in automaton array (auto) : when line_offset is greater than 80.
 			// that means the line is read
 			if (line_offset < 80) { // 80 because zero-based offset
-				throw new Error('State error: no value in automaton array in the middle of string!');
+				throw new Error('State error: no value in automaton array in the middle of string: automaton name: ' + auto.name + ', offset: ' + line_offset + '!');
 			}
 
 			return {
@@ -29,7 +29,7 @@ module.exports = function automaton (object, chunk, chunk_offset, line_offset, a
 			// as the previous check failed, we are in the middle of the line.
 			// as this check passed, the char at chunk[i] is not compatible with the automaton array
 			// this is an error
-			console.log(String.fromCharCode(chunk[i]));
+			console.log('Log: chunk is broken at:', i, ' actual char is:', String.fromCharCode(chunk[i]), ', automaton name:', auto.name, ', line offset:', line_offset);
 			console.log(i);
 			return {
 				signal: signal.WRONG
