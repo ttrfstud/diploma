@@ -45,8 +45,9 @@ describe('classes', function () {
 		in_class('minus').only(['-']);
 		in_class('nl').only(['\r', '\n']);
 		in_class('apostrophe').only(['\'']);
+		in_class('n').only(['N']);
 
-		number_of_classes_is(16);
+		number_of_classes_is(17);
 
 		done();
 	});

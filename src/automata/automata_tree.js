@@ -1,6 +1,8 @@
 var skip        = require('./skip');
-var atom_hetatm = require('./atom_hetatm');
+var atom        = require('./atom');
+var hetatm      = require('./hetatm');
 var model       = require('./model');
+var endmdl      = require('./endmdl');
 
 module.exports = {
 	H: {
@@ -30,7 +32,7 @@ module.exports = {
 				},
 				A: {
 					T: {
-						M: atom_hetatm
+						M: hetatm
 					}
 				}
 			},
@@ -238,7 +240,7 @@ module.exports = {
 			D: {
 				M: {
 					D: {
-						L: skip
+						L: endmdl
 					}
 				},
 				' ': {
@@ -321,7 +323,7 @@ module.exports = {
 			O: {
 				M: {
 					' ': {
-						' ': atom_hetatm
+						' ': atom
 					}
 				}
 			}

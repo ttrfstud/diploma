@@ -60,4 +60,15 @@ describe('automata_tree', function () {
 
 		done();
 	});
+
+	it('#actual automata', function (done) {
+		var tree = automata_tree;
+
+		tree['A']['T']['O']['M'][' '][' '].should.be.instanceof(Array);
+		tree['H']['E']['T']['A']['T']['M'].should.be.instanceof(Array);
+		tree['M']['O']['D']['E']['L'][' '].should.be.instanceof(Array);
+		tree['E']['N']['D']['M']['D']['L'].should.be.instanceof(Array);
+
+		done();
+	})
 });

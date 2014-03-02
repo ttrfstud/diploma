@@ -23,6 +23,9 @@ module.exports = {
 	h: {
 		0x48: 1
 	},
+	n: {
+		0x4e: 1
+	},
 	dec: {
 		0x30 : 1, 
 		0x31 : 1, 
