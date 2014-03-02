@@ -33,38 +33,38 @@ module.exports = [
 /*28 */[union(classes.w), '_'], /* ws 28-30 */
 /*29 */[union(classes.w), '_'],
 /*30 */[union(classes.w), '_'],
-/*31 */[union(classes.dec, classes.w), 'x'], /* x */
-/*32 */[union(classes.dec, classes.w), 'x'],
-/*33 */[union(classes.dec, classes.w), 'x'],
+/*31 */[union(classes.dec, classes.w, classes.minus), 'x'], /* x */
+/*32 */[union(classes.dec, classes.w, classes.minus), 'x'],
+/*33 */[union(classes.dec, classes.w, classes.minus), 'x'],
 /*34 */[union(classes.dec), 'x'],
 /*35 */[union(classes.dot), 'x'],
 /*36 */[union(classes.dec), 'x'],
 /*37 */[union(classes.dec), 'x'],
 /*38 */[union(classes.dec), 'x'],
-/*39 */[union(classes.dec, classes.w), 'y'], /* y */
-/*40 */[union(classes.dec, classes.w), 'y'],
-/*41 */[union(classes.dec, classes.w), 'y'],
+/*39 */[union(classes.dec, classes.w, classes.minus), 'y'], /* y */
+/*40 */[union(classes.dec, classes.w, classes.minus), 'y'],
+/*41 */[union(classes.dec, classes.w, classes.minus), 'y'],
 /*42 */[union(classes.dec), 'y'],
 /*43 */[union(classes.dot), 'y'],
 /*44 */[union(classes.dec), 'y'],
 /*45 */[union(classes.dec), 'y'],
 /*46 */[union(classes.dec), 'y'],
-/*47 */[union(classes.dec, classes.w), 'z'], /* z */
-/*48 */[union(classes.dec, classes.w), 'z'],
-/*49 */[union(classes.dec, classes.w), 'z'],
+/*47 */[union(classes.dec, classes.w, classes.minus), 'z'], /* z */
+/*48 */[union(classes.dec, classes.w, classes.minus), 'z'],
+/*49 */[union(classes.dec, classes.w, classes.minus), 'z'],
 /*50 */[union(classes.dec), 'z'],
 /*51 */[union(classes.dot), 'z'],
 /*52 */[union(classes.dec), 'z'],
 /*53 */[union(classes.dec), 'z'],
 /*54 */[union(classes.dec), 'z'],
-/*55 */[union(classes.dec, classes.w), 'occupancy'], /* occupancy */
-/*56 */[union(classes.dec, classes.w), 'occupancy'],
-/*57 */[union(classes.dec, classes.dot), 'occupancy'],
+/*55 */[union(classes.dec, classes.w, classes.minus), 'occupancy'], /* occupancy */
+/*56 */[union(classes.dec, classes.w, classes.minus), 'occupancy'],
+/*57 */[union(classes.dec), 'occupancy'],
 /*58 */[union(classes.dot), 'occupancy'],
 /*59 */[union(classes.dec), 'occupancy'],
 /*60 */[union(classes.dec), 'occupancy'],
-/*61 */[union(classes.dec, classes.w), 'temp_factor'], /* temp_factor */
-/*62 */[union(classes.dec, classes.w), 'temp_factor'],
+/*61 */[union(classes.dec, classes.w, classes.minus), 'temp_factor'], /* temp_factor */
+/*62 */[union(classes.dec, classes.w, classes.minus), 'temp_factor'],
 /*63 */[union(classes.dec), 'temp_factor'],
 /*64 */[union(classes.dot), 'temp_factor'],
 /*65 */[union(classes.dec), 'temp_factor'],
@@ -81,6 +81,6 @@ module.exports = [
 /*76 */[union(classes.w), '_'], 
 /*77 */[union(classes.an, classes.w), 'element'], /* element */
 /*78 */[union(classes.an), 'element'],
-/*79 */[union(classes.w, classes.plus_minus, classes.dec), 'charge'], /* charge */
-/*80 */[union(classes.w, classes.plus_minus, classes.dec), 'charge']
+/*79 */[union(classes.w, classes.plus, classes.minus, classes.dec), 'charge'], /* charge */
+/*80 */[union(classes.w, classes.plus, classes.minus, classes.dec), 'charge']
  ];
