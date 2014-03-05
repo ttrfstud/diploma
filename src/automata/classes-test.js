@@ -46,8 +46,11 @@ describe('classes', function () {
 		in_class('nl').only(['\r', '\n']);
 		in_class('apostrophe').only(['\'']);
 		in_class('n').only(['N']);
+		in_class('c').only(['C']);
+		in_class('s').only(['S']);
+		in_class('r').only(['R']);
 
-		number_of_classes_is(17);
+		number_of_classes_is(20);
 
 		done();
 	});
