@@ -1,3 +1,7 @@
+console = {
+	log: function () {}
+};
+
 exports.arrays_equal = function arrays_equal(a1, a2) {
 	if (a1.length !== a2.length) {
 		return false;
@@ -78,26 +82,23 @@ exports.init_model = function init_model(model) {
 	return _model;
 };
 
-exports.determine_automaton = function determine_automaton(tree, chunk, i, determination_array) {
-	var _determination_array = determination_array ? determination_array.slice(0) : [];
+exports.detauto = function (tree, chunk, i, darr) {
+	var i0;
 
-	console.log('bifo',JSON.stringify(tree));
-	for (var i0 = 0; i0 < _determination_array.length; i0++) {
-		tree = tree[_determination_array[i]];
-		console.log('bifo',JSON.stringify(tree));
+	darr = darr ? darr.slice(0) : [];
+
+	for (i0 = 0; i0 < darr.length; i0++) {
+		tree = tree[darr[i0]];
 	}
-	
-	console.log('bifobifo',JSON.stringify(tree));
 
-	while(typeof chunk[i] !== 'undefined' && !Array.isArray(tree = tree[chunk[i]])) {
-		console.log('in',JSON.stringify(tree));
-		_determination_array.push(chunk[i]);
+	while(tree && !Array.isArray(tree = tree[chunk[i]])) {
+		darr.push(chunk[i]);
 		i++;
 	}
 
 	if (!Array.isArray(tree)) {
 		return {
-			determination_array: _determination_array,
+			darr: darr,
 		};
 	} else {
 		return {

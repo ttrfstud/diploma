@@ -20,6 +20,7 @@ describe('automaton', function () {
 	// it is following the automaton array via chunk
 	describe('skip automata', function (done) {
 		it('#skip automaton (complete line)', function (done) {
+			// 60 long
 			var chunk = tc('123456789012345678901234567890123456789012345678901234567890');
 			automaton('whatever', chunk, 30, 50, []).should.eql({
 				chunk_offset: 59, // last traversed, not next to traverse!
@@ -30,9 +31,9 @@ describe('automaton', function () {
 		});		
 
 		it('#skip automaton (complete line and new lines)', function (done) {
-			var chunk = tc('123456789012345678901234567890123456789012345678901234567890\n\n\n\n\n\n1234567890123456789012345678901234567890');
+			var chunk = tc('123456789012345678901234567890123456789012345678901234567890\n\n\n\n\n\n\r\r\r\n\n1234567890123456789012345678901234567890');
 			automaton('whatever', chunk, 30, 50, []).should.eql({
-				chunk_offset: 65, // last traversed, not next to traverse!
+				chunk_offset: 70, // last traversed, not next to traverse!
 				signal: signal.READ_LINE
 			});
 
@@ -40,6 +41,7 @@ describe('automaton', function () {
 		});		
 
 		it('#skip automaton (incomplete line)', function (done) {
+							012345678901234567890123456789012345678901234567890123456789012345678901234567890;
 			var chunk = tc('12345678901234567890123456789012345678901234567890123456789');
 			automaton('whatever', chunk, 30, 50, []).should.eql({
 				chunk_offset: 58, // last traversed, not next to traverse!
@@ -66,7 +68,7 @@ describe('automaton', function () {
 	// neo - not empty object
 	// -------
 	// e - automaton should report error
-	// ne - automaton should not reports error
+	// ne - automaton should not report error
 
 	// another classification
 	// a - line length
@@ -168,7 +170,7 @@ describe('automaton', function () {
 		object.should.eql({
 			rec: tc('A'),
 			'_': tc('T')
-		})
+		});
 
 		done();
 	});	
@@ -250,10 +252,10 @@ describe('automaton', function () {
 		});
 
 		// Test continues, we want to read to the end. New chunk comes in
-		var result = automaton(object, tc('  \nA'), 0, 78, auto);
+		var result = automaton(object, tc('  \n\n\n\n\n\nA'), 0, 78, auto);
 
 		result.should.eql({
-			chunk_offset: 2, // last read byte was newline
+			chunk_offset: 7, // last read byte was newline
 			signal: signal.READ_LINE
 		});
 
@@ -319,7 +321,7 @@ describe('automaton', function () {
 			charge: tc('  ')
 		});
 
-		// We want to read line to the end
+		// We want to read chunk to the end
 		object = {};
 		result = automaton(object, tc(line), 79, 0, atom_auto);
 
@@ -340,7 +342,7 @@ describe('automaton', function () {
 	it('#a < b, se, eb', function (done) {
 		var object = {};
 					012345678901234567890123456789012345678901234567890123456789012345678901234567890;
-		var line = 'ATOM  16596  N   GLN C 123       8.285  -2.726 -26.326  1.00 43.96           N  \nA';
+		var line = 'ATOM  16596  N   GLN C 123       8.285  -2.726 -26.326  1.00 43.96           N  \n\n\n\n\n\nA';
 		var chunk_offset = 0;
 		var line_offset = 0; // next line byte to fetch
 		var auto = atom_auto;
@@ -348,7 +350,7 @@ describe('automaton', function () {
 		var result = automaton(object, tc(line), chunk_offset, line_offset, auto);
 
 		result.should.eql({
-			chunk_offset: 80, // last read byte was newline
+			chunk_offset: 85, // last read byte was newline
 			signal: signal.READ_LINE
 		});
 
@@ -375,10 +377,10 @@ describe('automaton', function () {
 
 		// We want to read line to the end
 		object = {};
-		result = automaton(object, tc(line), 81, 0, atom_auto);
+		result = automaton(object, tc(line), 86, 0, atom_auto);
 
 		result.should.eql({
-			chunk_offset: 81,
+			chunk_offset: 86,
 			line_offset: 0,
 			signal: signal.INCOMPLETE_LINE
 		});
@@ -394,7 +396,7 @@ describe('automaton', function () {
 	it('#a < b, sa, eb', function (done) {
 		var object = {};
 					012345678901234567890123456789012345678901234567890123456789012345678901234567890;
-		var line = ' \nATOM  16596  N   GLN C 123       8.285  -2.726 -26.326  1.00 43.96           N  \nA';
+		var line = ' \nATOM  16596  N   GLN C 123       8.285  -2.726 -26.326  1.00 43.96           N  \n\r\r\n\r\r\nA';
 		var chunk_offset = 2;
 		var line_offset = 0; // next line byte to fetch
 		var auto = atom_auto;
@@ -402,7 +404,7 @@ describe('automaton', function () {
 		var result = automaton(object, tc(line), chunk_offset, line_offset, auto);
 
 		result.should.eql({
-			chunk_offset: 82, // last read byte was newline
+			chunk_offset: 88, // last read byte was newline
 			signal: signal.READ_LINE
 		});
 
@@ -429,10 +431,10 @@ describe('automaton', function () {
 
 		// We want to read line to the end
 		object = {};
-		result = automaton(object, tc(line), 83, 0, atom_auto);
+		result = automaton(object, tc(line), 89, 0, atom_auto);
 
 		result.should.eql({
-			chunk_offset: 83,
+			chunk_offset: 89,
 			line_offset: 0,
 			signal: signal.INCOMPLETE_LINE
 		});
@@ -495,7 +497,7 @@ describe('automaton', function () {
 
 		result.should.eql({
 			chunk_offset: 81,
-			line_offset: 79,
+			line_offset: 79, // we've read that many bytes in line
 			signal: signal.INCOMPLETE_LINE
 		});
 
@@ -521,10 +523,10 @@ describe('automaton', function () {
 		});
 
 		// New chunk comes in ...
-		result = automaton(object, tc('\nAT'), 0, 80, atom_auto);
+		result = automaton(object, tc('\n\r\r\r\r\rAT'), 0, 80, atom_auto);
 
 		result.should.eql({
-			chunk_offset: 0,
+			chunk_offset: 5,
 			signal: signal.READ_LINE
 		});
 
@@ -606,6 +608,7 @@ describe('automaton', function () {
 
 		done();
 	});
+
 	it('#a > b, sb, eb ( copy )', function (done) {
 		var object = {rec: tc('A'), '_': tc('T')};
 					012345678901234567890123456789012345678901234567890123456789012345678901234567890;
@@ -736,10 +739,10 @@ describe('automaton', function () {
 		});
 
 		// Next chunk comes in..
-		result = automaton(object, tc('\nA'), 0, 80, atom_auto);
+		result = automaton(object, tc('\n\n\n\r\rA'), 0, 80, atom_auto);
 
 		result.should.eql({
-			chunk_offset: 0,
+			chunk_offset: 4,
 			signal: signal.READ_LINE
 		});
 
@@ -766,10 +769,10 @@ describe('automaton', function () {
 
 		// To the end..
 		object = {};
-		result = automaton(object, tc('\nA'), 1, 0, atom_auto);
+		result = automaton(object, tc('\n\n\n\r\rA'), 5, 0, atom_auto);
 
 		result.should.eql({
-			chunk_offset: 1,
+			chunk_offset: 5,
 			line_offset: 0,
 			signal: signal.INCOMPLETE_LINE
 		});
@@ -781,7 +784,7 @@ describe('automaton', function () {
 		done();
 	});
 
-	it('#a > b, sb, ea', function (done) {
+	it('#a > b, se, ea', function (done) {
 		var object = {};
 					012345678901234567890123456789012345678901234567890123456789012345678901234567890;
 		var line = 'ATOM  16596  N   GLN C 123       8.285  -2.726 -26.326  1.00 43.96           N ';

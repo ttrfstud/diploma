@@ -3,12 +3,12 @@ var union   = require('../util').object_concat;
 var classes = require('./classes');
 
 module.exports = [
-/* 1 */[union(classes.a, classes.h), 'rec'], /* 'ATOM  ' */
-/* 2 */[union(classes.t, classes.e), '_'],
-/* 3 */[union(classes.o, classes.t), '_'],
-/* 4 */[union(classes.m, classes.a), '_'],
-/* 5 */[union(classes.w, classes.t), '_'],
-/* 6 */[union(classes.w, classes.m), '_'],
+/* 1 */[union(classes.a), 'rec'], /* 'ATOM  ' */
+/* 2 */[union(classes.t), '_'],
+/* 3 */[union(classes.o), '_'],
+/* 4 */[union(classes.m), '_'],
+/* 5 */[union(classes.w), '_'],
+/* 6 */[union(classes.w), '_'],
 /* 7 */[union(classes.dec, classes.w), 'serial'], /* serial */
 /* 8 */[union(classes.dec, classes.w), 'serial'], 
 /* 9 */[union(classes.dec, classes.w), 'serial'],  
@@ -79,7 +79,7 @@ module.exports = [
 /*74 */[union(classes.w), '_'], 
 /*75 */[union(classes.w), '_'], 
 /*76 */[union(classes.w), '_'], 
-/*77 */[union(classes.an, classes.w), 'element'], /* element */
+/*77 */[union(classes.w, classes.an), 'element'], /* element */
 /*78 */[union(classes.an), 'element'],
 /*79 */[union(classes.w, classes.plus, classes.minus, classes.dec), 'charge'], /* charge */
 /*80 */[union(classes.w, classes.plus, classes.minus, classes.dec), 'charge']

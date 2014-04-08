@@ -54,8 +54,8 @@ describe('reader', function () {
 			// Checking state
 			// as title is skip automaton it should have immediately returned that it "read" the string
 			should.not.exist(reader0.determination_array);
-			reader0.line_offset.should.equal(0);
-			should.not.exist(reader0.current_auto);
+			reader0.line_offset.should.equal(13);
+			reader0.current_auto.name.should.equal('skip');
 			reader0.current_object.should.eql({});
 
 			done();
@@ -196,7 +196,6 @@ describe('reader', function () {
 
 		var hetatm_read = false;
 		reader0.on('hetatm', function (obj) {
-			console.log('hi');
 			obj.should.eql({
 				_: tc('               '),
 				serial: tc('47053'),
