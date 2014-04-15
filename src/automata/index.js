@@ -88,7 +88,6 @@ r.det = function () {
   }
 };
 
-// 6 first chars can be skipped
 r.run = function () {
   var _, isarr, cc, ac;
 
@@ -124,15 +123,20 @@ r.getch = function () {
   _.ac = _.auto[0];
 
   _.chnk = _.chnk.slice(1);
-  _.arr = _.arr.slice(1);
+  _.auto = _.auto.slice(1);
 };
 
 r.ungetch = function () {
-  var _;
+  var _, tmp;
 
   _ = this;
 
-  _.chnk = Buffer.concat([new Buffer(_.cc), _.chnk]);
+  tmp = new Buffer(1);
+  tmp[0] = _.cc;
+
+  _.chnk = Buffer.concat([tmp, _.chnk]);
+
+  _.cc = null;
 }
 
 r.skipnl = function () {
@@ -143,8 +147,6 @@ r.skipnl = function () {
   while (isnl(_.chnk[0])) {
     _.chnk = _.chnk.slice(1);
   }
-
-  _.ungetch();
 };
 
 module.exports = reader;
