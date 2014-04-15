@@ -8,8 +8,10 @@ describe('atom parser', function () {
 
 	it('#2hrt', function (done) {
 		parse('2hrt', null, function (atoms, hets) {
-			console.log(atoms);
-			console.log(hets);
+			hets[0].x.should.equal(33.445);
+			hets[0].y.should.equal(-21.436);
+			hets[0].z.should.equal(-11.942);
+			done();
 		}, {file: 1});
 
 	});

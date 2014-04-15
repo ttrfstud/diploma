@@ -82,31 +82,6 @@ exports.init_model = function init_model(model) {
 	return _model;
 };
 
-exports.detauto = function (tree, chunk, i, darr) {
-	var i0;
-
-	darr = darr ? darr.slice(0) : [];
-
-	for (i0 = 0; i0 < darr.length; i0++) {
-		tree = tree[darr[i0]];
-	}
-
-	while(tree && !Array.isArray(tree = tree[chunk[i]])) {
-		darr.push(chunk[i]);
-		i++;
-	}
-
-	if (!Array.isArray(tree)) {
-		return {
-			darr: darr,
-		};
-	} else {
-		return {
-			auto: tree
-		};
-	}
-};
-
 exports.object_concat = function object_concat() {
 	var result = {};
 

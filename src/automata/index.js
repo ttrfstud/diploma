@@ -1,111 +1,150 @@
 var assert                  = require('assert');
 
 var tree                    = require('./automata_tree');
-var signals                 = require('./signals');
-var detauto     			= require('../util').detauto;
-var automaton               = require('./automaton');
 
-var debug					= require('../debug');
+
+var isnl = function (c) {
+  return c === 10 || c === 13;
+}
+
 
 function reader () {
-	this.linofs = 0;
-	this.curauto = null;
-	this.curobj = {};
-
-	this.subs = {};
-
-	this.detarr = null;
-
-	this.chread = 0;
+  this.subs = [];
 }
 
-reader.prototype.on = function (type, sub) {
-	this.subs[type] = sub;
+var r = reader.prototype;
+
+r.on = function (type, sub) {
+  this.subs[type] = sub;
 };
 
-reader.prototype.readmore = function (chunk) {
-	var decision;
-	var i;
+r.read = function (chunk) {
+  var res;
+  var _;
+  var bytesread;
 
-	console.log('chread', this.chread);
+  _ = this;
+  
+  _.chnk = chunk;
 
-	console.log('chunk0', chunk);
+  while(_.chnk.length) {
+    if (!_.arr && !_.auto) { // new line; needs 6 bytes to determine what line it is on
+      _.det();
 
-	console.log(this.linofs);
-	for (i = 0; i < chunk.length; i++, this.linofs++) {
-		if (!this.curauto && !this.detarr) {
-			debug.addline();
-			decision = detauto(tree, chunk, i, null);
+      if (_.arr) {
+        break;
+      }
+    }
 
-			if (this.curauto = decision.auto) {
-				this.linofs = 5;
-				i += 5;
-			} else {
-				this.detarr = decision.darr;
-				this.linofs = this.detarr.length;
-				break;
-			}
-			continue;
-		}
+    if (_.arr) {
+      assert.equal(_.auto, null);
 
-		if (this.detarr) {
-			assert.equal(this.curauto, null);
-			assert.equal(i, 0);
+      _.det();
 
-			decision = detauto(tree, chunk, i, this.detarr);
+      if (_.arr) {
+        break;
+      }
+    }
 
-			if (decision.auto) {
-				this.curauto = decision.auto;
-				this.linofs = i = 5;
-				this.detarr = null;
-			} else {
-				this.detarr = decision.darr;
-				this.linofs = this.detarr.length;
-				break;	
-			}
+    if (_.auto) {
+      assert.equal(_.arr, null);
+      _.buf = _.buf || [];
 
-			continue;
-		}
+      try {
+        _.run();
+      } catch (e) {
+        throw 1;
+      }
+      
+      if (_.auto) {
+        break;
+      } else {
+        if (_.subs[_.auto.name]) {
+          _.subs[_.auto.name].call(null, _.obj);
+        }
 
-		if (this.curauto) {
-			assert.equal(this.detarr, null);
+        _.buf = null;
+      }
+    }
+  }
+};  
 
-			decision = automaton(this.curobj, chunk, i, this.linofs, this.curauto);
-			
-			switch (decision.signal) {
-				case signals.WRONG:
-					throw 'Error in pdb!';
-					break;
-				case signals.INCOMPLETE_LINE:
-					assert.equal(decision.chunk_offset + 1 < chunk.length, false);
-					this.linofs = decision.line_offset;
-					break;
-				case signals.READ_LINE:
-					this.linofs = -1;
-					i = decision.chunk_offset;
-					console.log(chunk.slice(i - 81, i).toString());
-					if (this.subs[this.curauto.name]) {
-						this.subs[this.curauto.name].call(null, this.curobj);
-					}
+r.det = function () {
+  var _, i, isarr;
 
-					this.curobj = {};
-					this.curauto = null;
-					break;
-				default:
-					assert.equal(1, 0);
-			}
-		}
-	}
+  _ = this;
 
+  isarr = Array.isArray;
+  _.arr = _.arr || tree;
 
-	console.log('end', this.linofs);
+  while (_.chnk.length && _.arr && !isarr(_.arr)) {
+    _.arr = _.arr[_.chnk[0]];
+    _.chnk = _.chnk.slice(1);
+  }
 
-	this.chread++;
-	this.linofs++;
-};	
+  if (isarr(_.arr)) {
+    _.arr = null;
+    _.auto = _.arr;
+  }
+};
 
-reader.prototype.consider = function (decision) {
+// 6 first chars can be skipped
+r.run = function () {
+  var _, isarr, cc, ac;
 
+  _ = this;
+
+  while (1) {
+    _.getch();
+
+   if (!_.cc) {
+    return;
+   }
+
+   if (!_.ac) {
+    break;
+   }
+
+   if (!_.ac[_.cc]) {
+    throw 1; // error
+   }
+
+   _.buf.push[_.cc];
+  }
+
+  _.skipnl();
+};
+
+r.getch = function () {
+  var _;
+
+  _ = this;
+
+  _.cc = _.chnk[0];
+  _.ac = _.auto[0];
+
+  _.chnk = _.chnk.slice(1);
+  _.arr = _.arr.slice(1);
+};
+
+r.ungetch = function () {
+  var _;
+
+  _ = this;
+
+  _.chnk = Buffer.concat([new Buffer(_.cc), _.chnk]);
 }
+
+r.skipnl = function () {
+  var _;
+
+  _ = this;
+
+  while (isnl(_.chnk[0])) {
+    _.chnk = _.chnk.slice(1);
+  }
+
+  _.ungetch();
+};
 
 module.exports = reader;

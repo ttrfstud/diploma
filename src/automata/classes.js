@@ -35,46 +35,8 @@ module.exports = {
 	r: {
 		0x52: 1
 	},
-	dec: {
-		0x30 : 1, 
-		0x31 : 1, 
-		0x32 : 1, 
-		0x33 : 1, 
-		0x34 : 1, 
-		0x35 : 1, 
-		0x36 : 1, 
-		0x37 : 1, 
-		0x38 : 1, 
-		0x39 : 1
-	},
-	an: {
-		0x41 : 1, 
-		0x42 : 1, 
-		0x43 : 1, 
-		0x44 : 1, 
-		0x45 : 1, 
-		0x46 : 1, 
-		0x47 : 1, 
-		0x48 : 1, 
-		0x49 : 1,
-		0x4a : 1, 
-		0x4b : 1, 
-		0x4c : 1, 
-		0x4d : 1, 
-		0x4e : 1, 
-		0x4f : 1, 
-		0x50 : 1, 
-		0x51 : 1, 
-		0x52 : 1, 
-		0x53 : 1, 
-		0x54 : 1, 
-		0x55 : 1, 
-		0x56 : 1, 
-		0x57 : 1, 
-		0x58 : 1, 
-		0x59 : 1, 
-		0x5a : 1
-	},
+	dec: {},
+	an: {},
 	w: {
 		0x20 : 1
 	},
@@ -93,6 +55,20 @@ module.exports = {
 	},
 	apostrophe: {
 		0x27: 1
-	}
+	},
+	whatever: {}
 };
 
+var i;
+
+for (i = 0; i < 256; i++) {
+	module.exports.whatever[i] = 1;
+}
+
+for (i = 0x41; i < 0x5b; i++) {
+	module.exports.an[i] = 1;
+}
+
+for (i = 0x30; i < 0x3a; i++) {
+	module.exports.dec[i] = 1;
+}

@@ -8,3 +8,7 @@ module.exports.addline = function () {
 module.exports.dump = function () {
 	console.log('Current line', line);
 };
+
+module.exports.getline = function () {
+	return line;
+}

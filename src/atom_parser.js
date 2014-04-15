@@ -1,90 +1,91 @@
 var req         = require('http').request;
 var read        = require('fs').createReadStream;
+var assert      = require('assert');
 var util        = require('./util');
-var reader      = require('./automata');
+var Reader      = require('./automata');
 var exists      = require('fs').existsSync;
 
 function parser(id, model, callback, options) {
-	this._id = id;
+  assert(id);
+  assert(callback);
 
-	this._options = options;
+  this.id = id;
 
-	if (model) {
-		this._model = util.init_model(model);
-	}
+  if (model) {
+    this.model = util.init_model(model);
+  }
 
-	this._cb = callback;
+  this.cb = callback;
+  this.options = options;
 
-	this._atoms = [];
-	this._hets = [];
+  this.atoms = [];
+  this.hets = [];
 
-	this._reader = new reader();
+  this.reader = new Reader();
 
-	if (model) {
-		this._reader.on('model', this.model_read.bind(this));
-		this._reader.on('endmdl', this.model_ended.bind(this));
-	} else {
-		this.inside_model = true;
-	}
+  if (model) {
+    this.reader.on('model', this.model_read.bind(this));
+    this.reader.on('endmdl', this.model_ended.bind(this));
+  } else {
+    this.inside_model = true;
+  }
 
-	this._reader.on('conect', this.model_ended.bind(this));
-	this._reader.on('master', this.model_ended.bind(this));
+  this.reader.on('conect', this.model_ended.bind(this));
+  this.reader.on('master', this.model_ended.bind(this));
 
-	this.should_parse = true;
+  this.should_parse = true;
 
-	this._reader.on('atom', this.atom_read.bind(this, this._atoms));
-	this._reader.on('hetatm', this.atom_read.bind(this, this._hets));
+  this.reader.on('atom', this.atom_read.bind(this, this.atoms));
+  this.reader.on('hetatm', this.atom_read.bind(this, this.hets));
 
-	this.parse();
+  this.parse();
 }
 
 parser.prototype.model_read = function (model_record) {
-	if (util.arrays_equal(this._model, model_record.model)) {
-		this.inside_model = true;
-	};
+  if (util.arrays_equal(this.model, model_record.model)) {
+    this.inside_model = true;
+  };
 }
 
 parser.prototype.atom_read = function (atoms, atom_record) {
-	console.log('atom!');
-	var atom = util.raw_atom_2_atom(atom_record);
-	atoms.push(atom);
+  var atom = util.raw_atom_2_atom(atom_record);
+  atoms.push(atom);
 }
 
 parser.prototype.model_ended = function () {
-	console.log('model ended!');
-	if (this.inside_model) {
-		if (!this.should_parse) {
-			throw new Error('State error: should_parse is falsy while inside_model!');
-		}
-		this.inside_model = false;
-		this.should_parse = false;
+  if (this.inside_model) {
+    assert(this.should_parse);
+    
+    this.inside_model = false;
+    this.should_parse = false;
 
-		this._cb({atoms : atoms, hets: hets});
-	}
+    this.cb({atoms : this.atoms, hets: this.hets});
+  }
 }
 
 parser.prototype.parse = function () {
-	var
-		_this = this;
+  var _;
 
+  _ = this;
 
-	if (this._options && this._options.file) {
-		console.log('Parsing file', this._id, '...');
-		res = read('atom_parser-test.' + this._id);
-	}
+  if (this.options && this.options.file) {
+    console.log('Parsing file', this.id, '...');
+    res = read('atom_parser-test.' + this.id);
+  } else {
+    // do request
+  }
 
-	res.on('readable', function () {
-		while(null !== (chunk = res.read())) {
-			console.log('chunk!');
-			if(_this.should_parse) {
-				_this._reader.readmore(chunk);
-			} else {
-				return;
-			}			
-		}
-	});
+  res.on('readable', function () {
+    while(null !== (chunk = res.read())) {
+      if(_.should_parse) {
+        _.reader.read(chunk);
+      } else {
+        return;
+      }     
+    }
+  });
 };
 
 module.exports = function (id, model, callback, options) {
-	new parser(id, model, callback, options);
+  new parser(id, model, callback, options);
 }
