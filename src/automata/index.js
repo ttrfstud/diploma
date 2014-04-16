@@ -10,6 +10,7 @@ var isnl = function (c) {
 
 function reader () {
   this.subs = [];
+  this.tree = tree;
 }
 
 var r = reader.prototype;
@@ -28,7 +29,7 @@ r.read = function (chunk) {
   _.chnk = chunk;
 
   while(_.chnk.length) {
-    if (!_.arr && !_.auto) { // new line; needs 6 bytes to determine what line it is on
+    if (!_.arr && !_.auto) { // new line
       _.det();
 
       if (_.arr) {
@@ -75,16 +76,20 @@ r.det = function () {
   _ = this;
 
   isarr = Array.isArray;
-  _.arr = _.arr || tree;
+  _.arr = _.arr || _.tree;
 
-  while (_.chnk.length && _.arr && !isarr(_.arr)) {
+  while (_.chnk.length && !isarr(_.arr)) {
     _.arr = _.arr[_.chnk[0]];
     _.chnk = _.chnk.slice(1);
+
+    if (!_.arr) {
+      throw 1;
+    }
   }
 
   if (isarr(_.arr)) {
-    _.arr = null;
     _.auto = _.arr;
+    _.arr = null;
   }
 };
 
@@ -97,10 +102,12 @@ r.run = function () {
     _.getch();
 
    if (!_.cc) {
+    _.ungetch();
     return;
    }
 
    if (!_.ac) {
+    _.ungetch();
     break;
    }
 
@@ -108,10 +115,28 @@ r.run = function () {
     throw 1; // error
    }
 
-   _.buf.push[_.cc];
+   _.buf.push(_.cc);
   }
 
   _.skipnl();
+};
+
+r.ungetch = function () {
+  var _, tmp;
+
+  _ = this;
+  tmp = [];
+
+  if (_.ac) {
+    _.auto = [_.ac].concat(_.auto);
+    _.ac = void 0;
+  }
+
+  if (_.cc) {
+    tmp.push(_.cc);
+    _.chnk = Buffer.concat([new Buffer(tmp), _.chnk], 1 + _.chnk.length);
+    _.cc = void 0;
+  }
 };
 
 r.getch = function () {
@@ -125,19 +150,6 @@ r.getch = function () {
   _.chnk = _.chnk.slice(1);
   _.auto = _.auto.slice(1);
 };
-
-r.ungetch = function () {
-  var _, tmp;
-
-  _ = this;
-
-  tmp = new Buffer(1);
-  tmp[0] = _.cc;
-
-  _.chnk = Buffer.concat([tmp, _.chnk]);
-
-  _.cc = null;
-}
 
 r.skipnl = function () {
   var _;
