@@ -10,5 +10,8 @@
   "license": "BSD-2-Clause",
   "bugs": {
     "url": "https://github.com/ttrfstud/diploma/issues"
+  },
+  "devDependencies": {
+    "mocha": "~1.18.2"
   }
 }

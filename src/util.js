@@ -1,7 +1,3 @@
-console = {
-	log: function () {}
-};
-
 exports.arrays_equal = function arrays_equal(a1, a2) {
 	if (a1.length !== a2.length) {
 		return false;
@@ -80,24 +76,4 @@ exports.init_model = function init_model(model) {
 	}
 
 	return _model;
-};
-
-exports.object_concat = function object_concat() {
-	var result = {};
-
-	for (var i = 0; i < arguments.length; i++) {
-		for (var j in arguments[i]) if (arguments[i].hasOwnProperty(j)) {
-			result[j] = arguments[i][j];
-		}
-	}
-
-	return result;
-};
-
-exports.safe_prop_append = function safe_prop_append(obj, prop, val) {
-	if (!obj[prop]) {
-		obj[prop] = [];
-	}
-
-	obj[prop].push(val);
 };
