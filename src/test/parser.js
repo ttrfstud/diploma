@@ -48,14 +48,15 @@ describe('atom parser', function () {
 
   it('bigger one', function (done) {
     parser('id', void 0, function (res) {
-      write('file', JSON.stringify(res), {encoding: 'utf8'})
+      console.log(res.atoms.length);
+      // write('file', JSON.stringify(res), {encoding: 'utf8'})
       done();
     }, function (id) {
       return read(__dirname + '/fixtures/2HRT_size1.pdb');
     })
   });
 
-  it.skip('2HRT', function (done) {
+  it('2HRT', function (done) {
     parser('id', void 0, function (res) {
       console.log(res.atoms.length);
       res.atoms.concat(res.hets).length.should.equal(47104);

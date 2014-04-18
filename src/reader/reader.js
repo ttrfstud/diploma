@@ -19,12 +19,12 @@ var r = reader.prototype;
 r.on = function (type, sub) {
   this.subs[type] = sub;
 };
-var nc = 0;
+
 r.read = function (chunk) {
   var _;
 
   _ = this;
-  nc++;
+
   _.chnk = chunk;
   _.skipnl();
 
@@ -51,12 +51,9 @@ r.read = function (chunk) {
       assert.equal(_.arr, null);
       _.buf = _.buf || [];
       _.name = _.auto.name;
-      nc === 5 && console.log('nc=5 > auto, pre', _.auto);
       
       _.run();
-      nc === 5 && console.log('nc=5', JSON.stringify(new Buffer(_.buf).toString('utf8')));
-      nc === 5 && console.log('nc=5 > auto', _.auto);
-      nc === 5 && console.log('nc=5 > name', _.name);
+
       if (_.auto) {
         break;
       } else {
@@ -126,13 +123,15 @@ r.run = function () {
 };
 
 r.ungetch = function () {
-  var _, tmp;
+  var _, tmp, name;
 
   _ = this;
   tmp = [];
 
   if (_.ac) {
+    name = _.auto.name;
     _.auto = [_.ac].concat(_.auto);
+    _.auto.name = name;
     _.ac = void 0;
   }
 

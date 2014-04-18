@@ -86,6 +86,25 @@ describe('reader', function () {
     });
   });
 
+  describe('#ungetch', function () {
+    it('and auto name', function (done) {
+      var reader = new Reader();
+
+      var auto = [1, 2, 3];
+      auto.name = 'test';
+
+      var ac = 4;
+
+      reader.ac = ac;
+      reader.auto = auto;
+      reader.ungetch();
+
+      reader.auto.name.should.equal('test');
+
+      done();
+    });
+  });
+
   it('#skipnl', function (done) {
     var reader = new Reader();
 
@@ -115,6 +134,10 @@ describe('reader', function () {
     it('!_.cc branch', function (done) {
       var chnk = new Buffer([2, 1, 1]);
       var auto = [[1,1,1], [1,1], [1,1], 40];
+      auto.name = 'test';
+
+      var rauto = [40];
+      rauto.name = 'test';
 
       var reader = new Reader();
 
@@ -128,7 +151,7 @@ describe('reader', function () {
       should.exist(reader.buf);
       
       reader.chnk.length.should.equal(0);
-      reader.auto.should.eql([40]);
+      reader.auto.should.eql(rauto);
       reader.buf.should.eql([2, 1, 1]);
 
       done();
@@ -350,8 +373,11 @@ describe('reader', function () {
     it('!_.arr && !_.auto -> _.arr, then _.auto (1)', function (done) {
       var reader = new Reader();
 
+      var auto = [1, 2];
+      auto.name = 'test';
+
       var chunk = new Buffer([1, 2, 3, 4]);
-      var tree = {1: {2: {3: {4: {5: [1, 2]}}}}};
+      var tree = {1: {2: {3: {4: {5: auto}}}}};
 
       reader.tree = tree;
 
@@ -360,7 +386,7 @@ describe('reader', function () {
       should.not.exist(reader.chnk);
       reader.tree.should.eql(tree);
       should.not.exist(reader.auto);
-      reader.arr.should.eql({5: [1, 2]});
+      reader.arr.should.eql({5: auto});
 
       chunk = new Buffer([5]);
 
@@ -369,7 +395,7 @@ describe('reader', function () {
       should.not.exist(reader.chnk);
       reader.tree.should.eql(tree);
       should.not.exist(reader.arr);
-      reader.auto.should.eql([1, 2]);
+      reader.auto.should.eql(auto);
 
       done();
     });
@@ -377,8 +403,11 @@ describe('reader', function () {
     it('!_.arr && !_.auto -> _.arr, then _.auto (2)', function (done) {
       var reader = new Reader();
 
+      var auto = [1, 2];
+      auto.name = 'test';
+
       var chunk = new Buffer([1, 2, 3]);
-      var tree = {1: {2: {3: {4: {5: [1, 2]}}}}};
+      var tree = {1: {2: {3: {4: {5: auto}}}}};
 
       reader.tree = tree;
 
@@ -387,7 +416,7 @@ describe('reader', function () {
       should.not.exist(reader.chnk);
       reader.tree.should.eql(tree);
       should.not.exist(reader.auto);
-      reader.arr.should.eql({4: {5: [1, 2]}});
+      reader.arr.should.eql({4: {5: auto}});
 
       chunk = new Buffer([4]);
 
@@ -396,7 +425,7 @@ describe('reader', function () {
       should.not.exist(reader.chnk);
       reader.tree.should.eql(tree);
       should.not.exist(reader.auto);
-      reader.arr.should.eql({5: [1, 2]});
+      reader.arr.should.eql({5: auto});
 
       chunk = new Buffer([5]);
 
@@ -405,7 +434,7 @@ describe('reader', function () {
       should.not.exist(reader.chnk);
       reader.tree.should.eql(tree);
       should.not.exist(reader.arr);
-      reader.auto.should.eql([1, 2]);
+      reader.auto.should.eql(auto);
 
       done();
     });
@@ -417,6 +446,9 @@ describe('reader', function () {
       var auto = [[1, 1], [1, 1], [1, 1], [1, 1]];
       auto.name = 'test';
 
+      var rauto = [[1, 1]];
+      rauto.name = 'test';
+
       var called = false;
       reader.on('test', function () { called = true; });
 
@@ -426,7 +458,7 @@ describe('reader', function () {
 
       should.not.exist(reader.chnk);
       should.not.exist(reader.arr);
-      reader.auto.should.eql([[1, 1]]);
+      reader.auto.should.eql(rauto);
       called.should.equal(false);
 
       done();
@@ -439,6 +471,12 @@ describe('reader', function () {
       var auto = [[1, 1], [1, 1], [1, 1], [1, 1], [1, 1]];
       auto.name = 'test';
 
+      var rauto1 = [[1, 1], [1, 1]];
+      rauto1.name = 'test';
+
+      var rauto2 = [[1, 1]];
+      rauto2.name = 'test';
+
       var called = false;
       reader.on('test', function () { called = true; });
 
@@ -448,7 +486,7 @@ describe('reader', function () {
 
       should.not.exist(reader.chnk);
       should.not.exist(reader.arr);
-      reader.auto.should.eql([[1, 1], [1, 1]]);
+      reader.auto.should.eql(rauto1);
       called.should.equal(false);
 
       chunk = new Buffer([1]);
@@ -456,7 +494,7 @@ describe('reader', function () {
       reader.read(chunk);
 
       should.not.exist(reader.arr);
-      reader.auto.should.eql([[1, 1]]);
+      reader.auto.should.eql(rauto2);
       called.should.equal(false);
 
       done();
@@ -540,9 +578,12 @@ describe('reader', function () {
     it('_.auto, chunk is longer, complete det on second read', function (done) {
       var reader = new Reader();
 
+      var rauto = [10];
+      rauto.name = 'test';
+
       var chunk = new Buffer([1, 1, 1, 1, 1, 10, 10, 13, 13, 100]);
       var auto = [[1, 1], [1, 1], [1, 1], [1, 1], [1, 1]];
-      var tree = {100: [10]};
+      var tree = {100: rauto};
 
       auto.name = 'test';
 
@@ -557,7 +598,7 @@ describe('reader', function () {
 
       should.not.exist(reader.chnk);
       should.not.exist(reader.arr);
-      reader.auto.should.eql([10]);
+      reader.auto.should.eql(rauto);
       called.should.equal(true);
       carg.should.eql([1, 1, 1, 1, 1]);
 
@@ -620,10 +661,13 @@ describe('reader', function () {
 
     it('complete read, but incomplete newlines', function (done) {
       var reader = new Reader();
+
+      var rauto = [101];
+      rauto.name = 'test';
       
       var chnk = new Buffer([1, 1, 1, 10, 10, 10, 10, 10, 13]);
       var auto = [[1, 1], [1, 1], [1, 1]];
-      var tree = {100: [101]};
+      var tree = {100: rauto};
 
       reader.auto = auto;
       
@@ -638,7 +682,7 @@ describe('reader', function () {
 
       reader.read(chnk);
 
-      reader.auto.should.eql([101]);
+      reader.auto.should.eql(rauto);
       should.not.exist(reader.arr);
 
       done();

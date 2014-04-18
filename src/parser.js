@@ -135,7 +135,7 @@ parser.prototype.model_ended = function () {
     _.cb({atoms : _.atoms, hets: _.hets});
   }
 }
-var nc = 0;
+
 parser.prototype.parse = function () {
   var _;
 
@@ -145,13 +145,8 @@ parser.prototype.parse = function () {
 
   res.on('readable', function () {
     while(null !== (chunk = res.read())) {
-      nc++;
       if(_.should_parse) {
-        try {
-          console.log('------------start' + nc);
-          console.log(chunk.toString('utf8'));
-          console.log('------------end' + nc);
-        _.reader.read(chunk); } catch (e) { console.log (e.stack);}
+        _.reader.read(chunk);
       } else {
         return;
       }     
