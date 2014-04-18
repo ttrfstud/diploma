@@ -1,6 +1,6 @@
 var assert      = require('assert');
 var Reader      = require('./reader/reader');
-
+var debuf       = require('./debuf');
 
 var meq = function (a1, a2) {
   var i;
@@ -45,18 +45,6 @@ var initm = function (mdl0) {
   }
 
   return mdl;
-};
-
-var toxyz = function (buf) {
-  return new Buffer(buf).toString('utf8');
-
-  // Spike
-  // var str = new Buffer(buf).toString('utf8');
-  // var x = str.substring(24, 32);
-  // var y = str.substring(32, 40);
-  // var z = str.substring(40, 48);
-
-  // return {x : parseFloat(x), y : parseFloat(y), z: parseFloat(z)};
 };
 
 function parser(id, model, callback, req) {
@@ -116,7 +104,7 @@ parser.prototype.atom_read = function (atoms, abuf) {
   _ = this;
 
   if (_.inside_model) {
-    atom = toxyz(abuf);
+    atom = debuf(abuf);
     atoms.push(atom);
   }
 }
