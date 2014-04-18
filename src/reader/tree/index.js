@@ -1,5 +1,6 @@
 var skip        = require('./skip');
 var atom        = require('./atom');
+var het         = require('./hetatm');
 var model       = require('./model');
 var endmdl      = require('./endmdl');
 var conect      = require('./conect');
@@ -33,7 +34,7 @@ module.exports = {
 				},
 				0x41: {
 					0x54: {
-						0x4d: atom,
+						0x4d: het,
 					}
 				}
 			},

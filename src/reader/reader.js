@@ -5,6 +5,9 @@ var isnl = function (c) {
   return c === 10 || c === 13;
 }
 
+var thrw = function () {
+  throw new Error();
+}
 
 function reader () {
   this.subs = [];
@@ -16,16 +19,20 @@ var r = reader.prototype;
 r.on = function (type, sub) {
   this.subs[type] = sub;
 };
-
+var nc = 0;
 r.read = function (chunk) {
   var res;
   var _;
   var bytesread;
-
+  nc++;
   _ = this;
   
   _.chnk = chunk;
-
+  _.skipnl();
+  // console.log('-----');
+  // console.log('|' + _.chnk.toString('utf8').substr(0, 90) + '|');
+  // console.log('|' + _.chnk.toString('utf8').substr(-90) + '|');
+  // console.log('+++++');
   while(_.chnk && _.chnk.length) {
     if (!_.arr && !_.auto) { // new line
       _.det();
@@ -76,12 +83,16 @@ r.det = function () {
   isarr = Array.isArray;
   _.arr = _.arr || _.tree;
 
+  var flag = false;
+
   while (_.chnk.length && !isarr(_.arr)) {
+    // nc === 24 && console.log(_.chnk[0].toString());
     _.arr = _.arr[_.chnk[0]];
     _.chnk = _.chnk.slice(1);
-
+    // nc === 24 && console.log(JSON.stringify(_.arr));
     if (!_.arr) {
-      throw 1;
+      // console.log(_.chnk.toString('utf8').substr(1, 10));
+      thrw();
     }
   }
 
@@ -107,7 +118,7 @@ r.run = function () {
    }
 
    if (!_.ac[_.cc]) {
-    throw 1; // error
+    thrw();
    }
 
    _.buf.push(_.cc);

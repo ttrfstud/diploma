@@ -598,5 +598,30 @@ describe('reader', function () {
       done();
     });
 
+    it('complete read, but incomplete newlines', function (done) {
+      var reader = new Reader();
+      
+      var chnk = new Buffer([1, 1, 1, 10, 10, 10, 10, 10, 13]);
+      var auto = [[1, 1], [1, 1], [1, 1]];
+      var tree = {100: [101]};
+
+      reader.auto = auto;
+      
+      reader.read(chnk);
+
+      should.not.exist(reader.auto);
+      should.not.exist(reader.arr);
+
+      chnk = new Buffer([10, 13, 100]);
+
+      reader.tree = tree;
+
+      reader.read(chnk);
+
+      reader.auto.should.eql([101]);
+      should.not.exist(reader.arr);
+
+      done();
+    });
   });
 });

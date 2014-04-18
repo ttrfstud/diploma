@@ -1,84 +1,157 @@
-var req         = require('http').request;
-var read        = require('fs').createReadStream;
 var assert      = require('assert');
-var util        = require('./util');
-var Reader      = require('./automata');
-var exists      = require('fs').existsSync;
+var Reader      = require('./reader/reader');
 
-function parser(id, model, callback, options) {
+
+var meq = function (a1, a2) {
+  var i;
+  var len1, len2;
+
+  a2 = a2.slice(4, 8);
+
+  len1 = a1.length;
+  len2 = a2.length;
+
+  if (len1 !== len2) {
+    return false;
+  }
+
+  for (i = 0; i < len1; i++) {
+    if (a1[i] !== a2[i]) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+var initm = function (mdl0) {
+  var mdl;
+  var dgt;
+
+  if (mdl0 > 9999 || mdl0 < 0) {
+    throw 1;
+  }
+
+  mdl = [];
+
+  while(mdl0) {
+    dgt = mdl0 % 10;
+    mdl.unshift(dgt + 0x30);
+    mdl0 = (mdl0 - dgt) / 10;
+  }
+
+  while(mdl.length !== 4) {
+    mdl.unshift(0x20);
+  }
+
+  return mdl;
+};
+
+var toxyz = function (buf) {
+  return new Buffer(buf).toString('utf8');
+
+  // Spike
+  // var str = new Buffer(buf).toString('utf8');
+  // var x = str.substring(24, 32);
+  // var y = str.substring(32, 40);
+  // var z = str.substring(40, 48);
+
+  // return {x : parseFloat(x), y : parseFloat(y), z: parseFloat(z)};
+};
+
+function parser(id, model, callback, req) {
+  var _;
+
+  _ = this;
+
   assert(id);
   assert(callback);
+  assert(req);
 
-  this.id = id;
+  _.id = id;
 
   if (model) {
-    this.model = util.init_model(model);
+    _.model = initm(model);
   }
 
-  this.cb = callback;
-  this.options = options;
+  _.cb = callback;
+  _.req = req;
 
-  this.atoms = [];
-  this.hets = [];
+  _.atoms = [];
+  _.hets = [];
 
-  this.reader = new Reader();
+  _.reader = new Reader();
 
   if (model) {
-    this.reader.on('model', this.model_read.bind(this));
-    this.reader.on('endmdl', this.model_ended.bind(this));
+    _.reader.on('model', _.model_read.bind(_));
+    _.reader.on('endmdl', _.model_ended.bind(_));
   } else {
-    this.inside_model = true;
+    _.inside_model = true;
+
+    _.reader.on('conect', _.model_ended.bind(_));
+    _.reader.on('master', _.model_ended.bind(_));
   }
 
-  this.reader.on('conect', this.model_ended.bind(this));
-  this.reader.on('master', this.model_ended.bind(this));
+  _.reader.on('atom', _.atom_read.bind(_, _.atoms));
+  _.reader.on('hetatm', _.atom_read.bind(_, _.hets));
 
-  this.should_parse = true;
-
-  this.reader.on('atom', this.atom_read.bind(this, this.atoms));
-  this.reader.on('hetatm', this.atom_read.bind(this, this.hets));
-
-  this.parse();
+  _.should_parse = true;
+  _.parse();
 }
 
-parser.prototype.model_read = function (model_record) {
-  if (util.arrays_equal(this.model, model_record.model)) {
-    this.inside_model = true;
+parser.prototype.model_read = function (mbuf) {
+  var _;
+
+  _ = this;
+
+  if (meq(_.model, mbuf)) {
+    _.inside_model = true;
   };
 }
 
-parser.prototype.atom_read = function (atoms, atom_record) {
-  var atom = util.raw_atom_2_atom(atom_record);
-  atoms.push(atom);
-}
+parser.prototype.atom_read = function (atoms, abuf) {
+  var _;
+  var atom;
 
-parser.prototype.model_ended = function () {
-  if (this.inside_model) {
-    assert(this.should_parse);
-    
-    this.inside_model = false;
-    this.should_parse = false;
+  _ = this;
 
-    this.cb({atoms : this.atoms, hets: this.hets});
+  if (_.inside_model) {
+    atom = toxyz(abuf);
+    atoms.push(atom);
   }
 }
 
+parser.prototype.model_ended = function () {
+  var _;
+
+  _ = this;
+
+  if (_.inside_model) {
+    assert(_.should_parse);
+    
+    _.inside_model = false;
+    _.should_parse = false;
+
+    _.cb({atoms : _.atoms, hets: _.hets});
+  }
+}
+var nc = 0;
 parser.prototype.parse = function () {
   var _;
 
   _ = this;
 
-  if (this.options && this.options.file) {
-    console.log('Parsing file', this.id, '...');
-    res = read('atom_parser-test.' + this.id);
-  } else {
-    // do request
-  }
+  res = _.req(_.id, _.model);
 
   res.on('readable', function () {
     while(null !== (chunk = res.read())) {
+      nc++;
       if(_.should_parse) {
-        _.reader.read(chunk);
+        try {
+          console.log('------------start' + nc);
+          console.log(chunk.toString('utf8'));
+          console.log('------------end' + nc);
+        _.reader.read(chunk); } catch (e) { console.log (e.stack);}
       } else {
         return;
       }     
@@ -86,6 +159,6 @@ parser.prototype.parse = function () {
   });
 };
 
-module.exports = function (id, model, callback, options) {
-  new parser(id, model, callback, options);
+module.exports = function (id, model, callback, req) {
+  new parser(id, model, callback, req);
 }
