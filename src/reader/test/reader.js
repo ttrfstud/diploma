@@ -15,55 +15,75 @@ describe('reader', function () {
     done();
   });
 
-  it('#getch', function (done) {
-    var reader = new Reader();
+  describe('#getch', function () {
+    it('test', function (done) {
+      var reader = new Reader();
 
-    reader.auto = new Buffer(3);
-    reader.auto[0] = 1;
-    reader.auto[1] = 2;
-    reader.auto[2] = 3;
+      reader.auto = new Buffer(3);
+      reader.auto[0] = 1;
+      reader.auto[1] = 2;
+      reader.auto[2] = 3;
 
-    reader.chnk = new Buffer(4);
-    reader.chnk[0] = 11;
-    reader.chnk[1] = 12;
-    reader.chnk[2] = 13;
-    reader.chnk[3] = 14;
+      reader.chnk = new Buffer(4);
+      reader.chnk[0] = 11;
+      reader.chnk[1] = 12;
+      reader.chnk[2] = 13;
+      reader.chnk[3] = 14;
 
-    reader.auto.length.should.eql(3);
-    reader.chnk.length.should.eql(4);
+      reader.auto.length.should.eql(3);
+      reader.chnk.length.should.eql(4);
 
-    should.not.exist(reader.cc);
-    should.not.exist(reader.ac);
+      should.not.exist(reader.cc);
+      should.not.exist(reader.ac);
 
-    reader.getch();
+      reader.getch();
 
-    reader.ac.should.eql(1);
-    reader.cc.should.eql(11);
+      reader.ac.should.eql(1);
+      reader.cc.should.eql(11);
 
-    reader.auto[0].should.eql(2);
-    reader.auto[1].should.eql(3);
+      reader.auto[0].should.eql(2);
+      reader.auto[1].should.eql(3);
 
-    reader.chnk[0].should.eql(12);
-    reader.chnk[1].should.eql(13);
-    reader.chnk[2].should.eql(14);
+      reader.chnk[0].should.eql(12);
+      reader.chnk[1].should.eql(13);
+      reader.chnk[2].should.eql(14);
 
-    reader.auto.length.should.eql(2);
-    reader.chnk.length.should.eql(3);
+      reader.auto.length.should.eql(2);
+      reader.chnk.length.should.eql(3);
 
-    reader.getch();
+      reader.getch();
 
-    reader.ac.should.eql(2);
-    reader.cc.should.eql(12);
+      reader.ac.should.eql(2);
+      reader.cc.should.eql(12);
 
-    reader.auto[0].should.eql(3);
+      reader.auto[0].should.eql(3);
 
-    reader.chnk[0].should.eql(13);
-    reader.chnk[1].should.eql(14);
+      reader.chnk[0].should.eql(13);
+      reader.chnk[1].should.eql(14);
 
-    reader.auto.length.should.eql(1);
-    reader.chnk.length.should.eql(2);
+      reader.auto.length.should.eql(1);
+      reader.chnk.length.should.eql(2);
 
-    done();
+      done();
+    });
+
+    it('and auto name', function (done) {
+      var reader = new Reader();
+
+      var auto = [1, 2, 3];
+      auto.name = 'test';
+
+      var chnk = [1, 2, 3];
+
+      reader.auto = auto;
+      reader.chnk = chnk;
+
+      reader.getch();
+
+      reader.auto.name.should.equal('test');
+
+      done();
+    });
   });
 
   it('#skipnl', function (done) {

@@ -21,18 +21,13 @@ r.on = function (type, sub) {
 };
 var nc = 0;
 r.read = function (chunk) {
-  var res;
   var _;
-  var bytesread;
-  nc++;
+
   _ = this;
-  
+  nc++;
   _.chnk = chunk;
   _.skipnl();
-  // console.log('-----');
-  // console.log('|' + _.chnk.toString('utf8').substr(0, 90) + '|');
-  // console.log('|' + _.chnk.toString('utf8').substr(-90) + '|');
-  // console.log('+++++');
+
   while(_.chnk && _.chnk.length) {
     if (!_.arr && !_.auto) { // new line
       _.det();
@@ -56,9 +51,12 @@ r.read = function (chunk) {
       assert.equal(_.arr, null);
       _.buf = _.buf || [];
       _.name = _.auto.name;
+      nc === 5 && console.log('nc=5 > auto, pre', _.auto);
       
       _.run();
-      
+      nc === 5 && console.log('nc=5', JSON.stringify(new Buffer(_.buf).toString('utf8')));
+      nc === 5 && console.log('nc=5 > auto', _.auto);
+      nc === 5 && console.log('nc=5 > name', _.name);
       if (_.auto) {
         break;
       } else {
@@ -86,12 +84,11 @@ r.det = function () {
   var flag = false;
 
   while (_.chnk.length && !isarr(_.arr)) {
-    // nc === 24 && console.log(_.chnk[0].toString());
+    
     _.arr = _.arr[_.chnk[0]];
     _.chnk = _.chnk.slice(1);
-    // nc === 24 && console.log(JSON.stringify(_.arr));
+    
     if (!_.arr) {
-      // console.log(_.chnk.toString('utf8').substr(1, 10));
       thrw();
     }
   }
@@ -148,14 +145,19 @@ r.ungetch = function () {
 
 r.getch = function () {
   var _;
+  var name;
 
   _ = this;
+
+  name = _.auto.name;
 
   _.cc = _.chnk[0];
   _.ac = _.auto[0];
 
   _.chnk = _.chnk.slice(1);
   _.auto = _.auto.slice(1);
+
+  _.auto.name = name;
 };
 
 r.skipnl = function () {

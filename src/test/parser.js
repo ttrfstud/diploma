@@ -1,6 +1,6 @@
 var parser = require('../parser');
 var read = require('fs').createReadStream;
-
+var write = require('fs').writeFileSync;
 var should = require('should');
 
 describe('atom parser', function () {
@@ -46,18 +46,20 @@ describe('atom parser', function () {
   //   })
   // });
 
-  // it('bigger one', function (done) {
-  //   parser('id', void 0, function (res) {
-  //     // console.log(res);
-  //     done();
-  //   }, function (id) {
-  //     return read(__dirname + '/fixtures/2HRT_size1.pdb');
-  //   })
-  // });
-
-  it('2HRT', function (done) {
+  it('bigger one', function (done) {
     parser('id', void 0, function (res) {
-      console.log(res);
+      write('file', JSON.stringify(res), {encoding: 'utf8'})
+      done();
+    }, function (id) {
+      return read(__dirname + '/fixtures/2HRT_size1.pdb');
+    })
+  });
+
+  it.skip('2HRT', function (done) {
+    parser('id', void 0, function (res) {
+      console.log(res.atoms.length);
+      res.atoms.concat(res.hets).length.should.equal(47104);
+
       done();
     }, function (id) {
       return read(__dirname + '/fixtures/2HRT.pdb');
