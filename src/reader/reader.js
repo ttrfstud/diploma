@@ -1,5 +1,7 @@
-var assert  = require('assert');
-var tree    = require('./tree');
+var assert = require('assert');
+var tree   = require('./tree');
+var tstr   = require('stream').Transform;
+
 
 var isnl = function (c) {
   return c === 10 || c === 13;
@@ -9,8 +11,10 @@ var thrw = function () {
   throw new Error();
 }
 
-function reader () {
-  this.subs = [];
+function reader (subs) {
+  tstr.call(this, { objectMode: true });
+
+  this.subs = subs || {};
   this.tree = tree;
 }
 
@@ -20,7 +24,7 @@ r.on = function (type, sub) {
   this.subs[type] = sub;
 };
 
-r.read = function (chunk) {
+r._transform = function (chunk, e, fin) {
   var _;
 
   _ = this;
@@ -58,7 +62,7 @@ r.read = function (chunk) {
         break;
       } else {
         if (_.subs[_.name]) {
-          _.subs[_.name].call(null, _.buf);
+          _.push({ name: _.name, buf: _.buf });
         }
 
         _.name = null;
@@ -68,6 +72,7 @@ r.read = function (chunk) {
   }
 
   _.chnk = null;
+  fin && fin();
 };  
 
 r.det = function () {
