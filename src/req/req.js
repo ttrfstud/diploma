@@ -1,12 +1,15 @@
-var _req = require('http').request;
-var rstr = require('stream').Readable;
+var assert = require('assert');
+var _req   = require('http').request;
+var rstr   = require('stream').Readable;
+var util   = require('util');
+util.inherits(req, rstr);
 
 var options = {
   hostname: 'www.rcsb.org',
   port: 80,
   path: '/pdb/files/',
   method: 'GET',
-  headers: {'Accept-Encoding': 'gzip;q=1.0, identity; q=0.5, *;q=0'}
+  // headers: {'Accept-Encoding': 'gzip;q=1.0, identity; q=0.5, *;q=0'}
 };
 
 var copy = function (o) {
@@ -22,7 +25,7 @@ var copy = function (o) {
   return res;
 }
 
-function req(id) {
+function req(id, uf) {
   var _;
 
   _ = this;
@@ -32,6 +35,11 @@ function req(id) {
   rstr.call(this);
 
   _.id = id;
+
+  if (uf) {
+    _.uf = uf;
+    _.bytecount = 0;
+  }
 };
 
 var r = req.prototype;
@@ -48,6 +56,8 @@ r.init = function () {
   var _;
   var opts;
 
+  _ = this;
+
   opts = copy(options);
   opts.path = opts.path + _.id + '.pdb';
 
@@ -62,7 +72,7 @@ r.init = function () {
     _.src.on('readable', function () {
       _.read(0);
     });
-  });
+  }).end();
 };
 
 r._read = function () {
@@ -71,17 +81,23 @@ r._read = function () {
 
   _ = this;
 
-  if (!_.res) {
-    if (!_.prg) {
+  if (!_.src) {
+    if (!_.initd) {
+      _.initd = true;
       _.init();
-      _.prg = true;
     }
     return _.push('');
   }
 
-  if (chunk = _.res.read()) {
+  if (chunk = _.src.read()) {
+    if (_.uf) {
+      _.bytecount += chunk.length;
+      console.log('Downloaded ', _.bytecount, 'bytes ...');
+    }
     _.push(chunk);
   } else {
     _.push('');
   }
 };
+
+module.exports = req;

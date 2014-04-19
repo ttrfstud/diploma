@@ -2,29 +2,26 @@ var dstr   = require('stream').Duplex;
 var req    = require('../req/req');
 var reader = require('../reader/reader');
 var parser = require('../parser/parser');
+var util   = require('util');
+util.inherits(compo, dstr);
 
-function err() {
-	var _;
-  var e;
-
-	_ = this;
-  e = new Error();
-
-	if (_._events && _._events['error']) {
-		_.emit('error', e);
-	} else {
-    throw e;
-  }
+function err(msg) {
+	throw new Error;
 }
 
-function compo() {
+function isnl(ch) {
+  return ch === '\r' || ch === '\n';
+}
+
+function compo(uf) {
 	var _;
 
 	_ = this;
 
-	tstr.call(_, { objectMode: true });
+	dstr.call(_, { objectMode: false });
 
 	_.buf = '';
+  _.uf = uf;
 }
 
 var c = compo.prototype;
@@ -39,35 +36,42 @@ c._write = function (chunk, e, fin) {
     return;
   }
 
-	_.buf += chunk.toString(e);
+	_.buf += chunk.toString('utf8');
 
-	if (_.buf.length.substr(-1) !== ';') {
+  _.skipnl();
+
+	if (_.buf.substr(-1) !== ';') {
 		return fin();
-	}
+	} else {
+    _.buf = _.buf.substr(0, _.buf.length - 1);
+  }
 
 	// malicious user
 	if (_.buf.length > 10) {
-		return err.call(_);
+		return err();
 	}
 
   splt = _.buf.split(',');
 
   if (!splt || splt.length > 2) {
-    return _err.call(_);
+    return err();
   }
 
   if (!splt[0].match(/[A-Za-z0-9]{4}/)) {
-    return _err.call(_);
+    return err();
   }
 
-  if (splt[1] && !splt[1].match(/[0-9]{1,4}/)) {
-    return _err.call(_);
+  if (splt[1]) {
+    if (!splt[1].match(/[0-9]{1,4}/)) {
+      return _err(fmt);
+    }
   }
 
   _.used = true;
   _.id = splt[0];
   _.mdl = splt[1];
 
+  _.read(0);
   fin();
 };
 
@@ -77,29 +81,51 @@ c._read = function () {
 
   _ = this;
 
-  if (!_.used) {
+  if(!_.used) {
     return _.push('');
   }
 
-  if ( obj = _.parse.read() ) {
+  if (!_.initd) {
+    if (!_.initd) {
+      _.init();
+      _.initd = true;
+    }
+    return _.push('');
+  }
+
+  if ( obj = _.parser.read() ) {
     _.push(obj);
   } else {
     _.push('');
   }
 };
 
-c._init = function () {
+c.init = function () {
   var _;
 
   _ = this;
 
   // pipe is: req | ungzip | reader | parser
-  _.req = new req(_.id);
-  _.read = new reader();
-  _.parse = new parser(_.id, _.mdl);
 
-  _.req.pipe(_.read).pipe(_.parse).on('readable', function () {
+  _.req = new req(_.id, _.uf);
+  _.reader = new reader({atom: 1, hetatm: 1, model: 1, endmdl: 1, conect: 1, master: 1});
+  _.parser = new parser(_.id, _.mdl);
+
+  _.req.pipe(_.reader).pipe(_.parser).on('readable', function () {
     _.read(0);
   });
-}
+};
 
+c.skipnl = function () {
+  var _;
+
+  _ = this;
+
+  if (_.buf) {
+    while(isnl(_.buf.substr(-1))) {
+      _.buf = _.buf.substr(0, _.buf.length - 1);
+    }
+  }
+};
+
+module.exports = compo;

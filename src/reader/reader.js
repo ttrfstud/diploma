@@ -1,7 +1,8 @@
 var assert = require('assert');
 var tree   = require('./tree');
 var tstr   = require('stream').Transform;
-
+var util   = require('util');
+util.inherits(reader, tstr);
 
 var isnl = function (c) {
   return c === 10 || c === 13;
@@ -20,11 +21,8 @@ function reader (subs) {
 
 var r = reader.prototype;
 
-r.on = function (type, sub) {
-  this.subs[type] = sub;
-};
-
 r._transform = function (chunk, e, fin) {
+  // console.log('are you gettn anthn?');
   var _;
 
   _ = this;

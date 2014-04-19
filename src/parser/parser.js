@@ -1,7 +1,8 @@
 var assert = require('assert');
-var Reader = require('./reader/reader');
 var debuf  = require('./debuf');
 var tstr   = require('stream').Transform;
+var util   = require('util');
+util.inherits(parser, tstr);
 
 var meq = function (a1, a2) {
   var i;
@@ -64,8 +65,6 @@ function parser(id, model) {
   } else {
     _.inside_model = true;
   }
-
-  _.parse();
 }
 
 var p = parser.prototype;
@@ -78,10 +77,10 @@ p._transform = function (typ, e, fin) {
   if (_.model) {
     switch(typ.name) {
       case 'model':
-        _.mdl(typ.buf, fin);
+        _.mdl(typ.buf);
         break;
       case 'endmdl':
-        _.emd(fin);
+        _.emd();
       break;
     }
   }
@@ -89,21 +88,22 @@ p._transform = function (typ, e, fin) {
   switch(typ.name) {
     case 'conect':
     case 'master':
-      _.emd(fin);
+      _.emd();
       break;
     case 'atom':
-      _.atm(typ.buf, 0, fin);
+      _.atm(typ.buf, 0);
       break;
     case 'hetatm':
-      _.atm(typ.buf, 1, fin);
+      _.atm(typ.buf, 1);
       break;
     default:
-      fin();
       break;
   }
+
+  fin();
 };
 
-p.mdl = function (mbuf, fin) {
+p.mdl = function (mbuf) {
   var _;
 
   _ = this;
@@ -111,20 +111,22 @@ p.mdl = function (mbuf, fin) {
   if (meq(_.model, mbuf)) {
     _.inside_model = true;
   }
-
-  fin();
 };
 
-p.emd = function (fin) {
+p.emd = function () {
+  var _;
+
+  _ = this;
+
   _.inside_model = false;
-  fin();
 };
 
-p.atm = function (abuf, atyp, fin) {
+p.atm = function (abuf, atyp) {
   var _;
 
   _ = this;
 
   _.push({type: atyp ? 'atom' : 'het', loc: debuf(abuf) });
-  fin();
 };
+
+module.exports = parser;
