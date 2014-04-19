@@ -32,8 +32,6 @@ function req(id) {
   rstr.call(this);
 
   _.id = id;
-
-  _.init();
 };
 
 var r = req.prototype;
@@ -74,10 +72,16 @@ r._read = function () {
   _ = this;
 
   if (!_.res) {
+    if (!_.prg) {
+      _.init();
+      _.prg = true;
+    }
     return _.push('');
   }
 
   if (chunk = _.res.read()) {
     _.push(chunk);
+  } else {
+    _.push('');
   }
 };
