@@ -1,6 +1,7 @@
-var assert      = require('assert');
-var Reader      = require('./reader/reader');
-var debuf       = require('./debuf');
+var assert = require('assert');
+var Reader = require('./reader/reader');
+var debuf  = require('./debuf');
+var tstr   = require('stream').Transform;
 
 var meq = function (a1, a2) {
   var i;
@@ -47,101 +48,83 @@ var initm = function (mdl0) {
   return mdl;
 };
 
-function parser(id, model, callback, req) {
+function parser(id, model) {
+  tstr.call(this, { objectMode: true });
+
   var _;
 
   _ = this;
 
   assert(id);
-  assert(callback);
-  assert(req);
 
   _.id = id;
 
   if (model) {
     _.model = initm(model);
-  }
-
-  _.cb = callback;
-  _.req = req;
-
-  _.atoms = [];
-  _.hets = [];
-
-  _.reader = new Reader();
-
-  if (model) {
-    _.reader.on('model', _.model_read.bind(_));
-    _.reader.on('endmdl', _.model_ended.bind(_));
   } else {
     _.inside_model = true;
-
-    _.reader.on('conect', _.model_ended.bind(_));
-    _.reader.on('master', _.model_ended.bind(_));
   }
 
-  _.reader.on('atom', _.atom_read.bind(_, _.atoms));
-  _.reader.on('hetatm', _.atom_read.bind(_, _.hets));
-
-  _.should_parse = true;
   _.parse();
 }
 
-parser.prototype.model_read = function (mbuf) {
+var p = parser.prototype;
+
+p._transform = function (typ, e, fin) {
+  var _;
+
+  _ = this;
+
+  if (_.model) {
+    switch(typ.name) {
+      case 'model':
+        _.mdl(typ.buf, fin);
+        break;
+      case 'endmdl':
+        _.emd(fin);
+      break;
+    }
+  }
+
+  switch(typ.name) {
+    case 'conect':
+    case 'master':
+      _.emd(fin);
+      break;
+    case 'atom':
+      _.atm(typ.buf, 0, fin);
+      break;
+    case 'hetatm':
+      _.atm(typ.buf, 1, fin);
+      break;
+    default:
+      fin();
+      break;
+  }
+};
+
+p.mdl = function (mbuf, fin) {
   var _;
 
   _ = this;
 
   if (meq(_.model, mbuf)) {
     _.inside_model = true;
-  };
-}
-
-parser.prototype.atom_read = function (atoms, abuf) {
-  var _;
-  var atom;
-
-  _ = this;
-
-  if (_.inside_model) {
-    atom = debuf(abuf);
-    atoms.push(atom);
   }
-}
 
-parser.prototype.model_ended = function () {
-  var _;
-
-  _ = this;
-
-  if (_.inside_model) {
-    assert(_.should_parse);
-    
-    _.inside_model = false;
-    _.should_parse = false;
-
-    _.cb({atoms : _.atoms, hets: _.hets});
-  }
-}
-
-parser.prototype.parse = function () {
-  var _;
-
-  _ = this;
-
-  res = _.req(_.id, _.model);
-
-  res.on('readable', function () {
-    while(null !== (chunk = res.read())) {
-      if(_.should_parse) {
-        _.reader.read(chunk);
-      } else {
-        return;
-      }     
-    }
-  });
+  fin();
 };
 
-module.exports = function (id, model, callback, req) {
-  new parser(id, model, callback, req);
-}
+p.emd = function (fin) {
+  _.inside_model = false;
+  fin();
+};
+
+p.atm = function (abuf, atyp, fin) {
+  var _;
+
+  _ = this;
+
+  _.push({type: atyp ? 'atom' : 'het', loc: debuf(abuf) });
+  fin();
+};
