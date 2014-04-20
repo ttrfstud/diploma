@@ -19,7 +19,7 @@ function compo(uf) {
 
 	_ = this;
 
-	dstr.call(_, { objectMode: false });
+	dstr.call(_, { objectMode: true });
 
 	_.buf = '';
   _.uf = uf;
@@ -82,14 +82,13 @@ c._read = function () {
 
   _ = this;
 
+
   if(!_.used) {
-    return _.push('');
+    return;
   }
 
-  if ( obj = _.parser.read() ) {
-    return _.push(JSON.stringify(obj));
-  } else {
-    _.push('');
+  while ( obj = _.parser.read() ) {
+    _.push(obj);
   }
 };
 
@@ -109,7 +108,37 @@ c.init = function () {
   });  
 
   _.parser.on('readable', function () {
-    _.read(0);
+      // first read happens when jsstr is piped into compo
+      // compo is supposed to return objects, but it did not have any objects then
+      // so it did not push anything
+      // that's why compo was left in "reading" state
+      // now, if we want to give it a kick to read from the _.parser
+      // we can't use _.read(0) because that function would return if the stream is _.readingState.reading (reading)
+      // that's why we call _._read() which in this case will read the chunk from _.parser (causing _.parser to set _.parser._readableState.needReadable)
+      // and when we _.push it will also reset itself from the "reading" state
+
+      // it would probably be unsafe to call _._read() just for the second read and here is the reason
+      // the consumer may be greedy and  call read() faster than parser has data
+      // consider two cases:
+      // 1. something is piped into compo. then we need to consider first read too.
+      // when dest is piped into compo it has no data in buffers. two things are done:
+      //  1. event handler to readable is attached. and needReadable is turned on
+      //  2. flow is called. flow will try to suck all data from the compo. but compo has no data yet. so flow will declare that compo _.readableState.ranOut of data (while compo is left is reading state, it just did not return)
+      //  3. now the flow has ended. if there is new data in compo, it would need to somehow notify dest about it.
+      //  4. so compo is now "reading" and "ranOut" and "needReadable"
+      //  5. new data comes into compo. it comes from parser and the flow should be continued
+      //  6. to continue flow we need to emit 'readable', so pipeOnReadable gets called
+      //  7. if we are last in pipe the flow would still need to be continued if there is end consumer in stream
+      //  8. in that case the consumer will listen to 'readable' and then suck all data from readable.
+      //  9. in either case we need to emit 'readable' event, no matter if end consumer or pipeOnReadable will suck data
+      // 10. to emit 'readable' event, needReadable must be true.
+      // 11. just by calling _.push we will fire 'readable'
+      // 12. that will start flow which will read()! all the data (in this case, one object) in a loop
+      // 13. all data read in loop would be fetched to jsstr (1 object). when it checks the state after fetching that object it finds that there is empty state and sets needReadable
+      // 14. the last call to read() in a loop will return null and leave compo in "reading" state
+      // 15. on the next data from _.parser 11. - 14. get repeated
+      // TODO: this works because of node current internals only.
+      _._read();
   });
 
   _.req.pipe(_.reader).pipe(_.parser);

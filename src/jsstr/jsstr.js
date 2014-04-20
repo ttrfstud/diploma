@@ -31,6 +31,7 @@ j._transform = function (obj, e, fin) {
 			_.push(',' + json);
 		}
 	}
+  console.log(obj);
 
 	fin();
 };
