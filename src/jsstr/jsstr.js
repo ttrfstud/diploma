@@ -3,7 +3,7 @@ var util = require('util');
 util.inherits(jsstr, tstr);
 
 function tostr(obj) {
-  return JSON.stringify(obj)
+  return JSON.stringify(obj);
 }
 
 function jsstr() {
@@ -35,12 +35,14 @@ j._transform = function (obj, e, fin) {
 	fin();
 };
 
-j._flush = function () {
+j._flush = function (fin) {
 	var _;
 
 	_ = this;
 
-	_.push(']');
-}
+	_.push(']\n');
+
+  fin();
+};
 
 module.exports = jsstr;
