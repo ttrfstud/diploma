@@ -65,6 +65,11 @@ r.init = function () {
   req = _req(opts, function (res) {
     _.src = res;
 
+    if (res.statusCode !== 200) {
+      // anything else but 200 is ignored
+      _.ignore = true;
+    }
+
     _.src.on('end', function () {
       _.push(null);
     });
@@ -97,7 +102,7 @@ r._read = function () {
       _.bytecount += chunk.length;
       console.log('Downloaded ', _.bytecount, 'bytes ...');
     }
-    _.push(chunk);
+    _.push(_.ignore? '' : chunk);
   } else {
     _.push('');
   }
