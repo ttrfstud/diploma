@@ -137,7 +137,7 @@ c.init = function () {
       // 13. all data read in loop would be fetched to jsstr (1 object). when it checks the state after fetching that object it finds that there is empty state and sets needReadable
       // 14. the last call to read() in a loop will return null and leave compo in "reading" state
       // 15. on the next data from _.parser 11. - 14. get repeated
-      // TODO: this works because of node current internals only.
+      // TODO: this works because of node current internals only. check to not break
       _._read();
   });
 

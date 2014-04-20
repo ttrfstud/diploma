@@ -4,6 +4,10 @@ var tstr   = require('stream').Transform;
 var util   = require('util');
 util.inherits(parser, tstr);
 
+var thrw = function () {
+  throw new Error();
+}
+
 var meq = function (a1, a2) {
   var i;
   var len1, len2;
@@ -31,7 +35,7 @@ var initm = function (mdl0) {
   var dgt;
 
   if (mdl0 > 9999 || mdl0 < 0) {
-    throw 1;
+    return thrw();
   }
 
   mdl = [];
@@ -126,7 +130,8 @@ p.atm = function (abuf, atyp) {
 
   _ = this;
 
-  _.push({type: atyp ? 'atom' : 'het', loc: debuf(abuf) });
+  if (_.inside_model)
+    _.push({type: atyp ? 'atom' : 'het', loc: debuf(abuf) });
 };
 
 module.exports = parser;
