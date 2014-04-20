@@ -17,13 +17,14 @@ function idstr (id) {
 
 var i = idstr.prototype;
 
-i.prototype._read = function () {
+i._read = function () {
 	var _;
 
 	_ = this;
 
 	if (!_.called) {
-		_.push(_.id);
+		_.push(_.id + ';');
+		_.called = true;
 	} else {
 		_.push(null);
 	}

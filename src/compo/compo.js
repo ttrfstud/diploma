@@ -2,6 +2,7 @@ var dstr   = require('stream').Duplex;
 var req    = require('../req/req');
 var reader = require('../reader/reader');
 var parser = require('../parser/parser');
+var jsstr = require('../jsstr/jsstr');
 var util   = require('util');
 util.inherits(compo, dstr);
 
@@ -33,7 +34,7 @@ c._write = function (chunk, e, fin) {
 	_ = this;
 
   if (_.used) {
-    return;
+    return fin();
   }
 
 	_.buf += chunk.toString('utf8');
@@ -63,16 +64,16 @@ c._write = function (chunk, e, fin) {
 
   if (splt[1]) {
     if (!splt[1].match(/[0-9]{1,4}/)) {
-      return _err(fmt);
+      return err();
     }
   }
 
   _.used = true;
   _.id = splt[0];
   _.mdl = splt[1];
-
-  _.read(0);
+  
   fin();
+  _.init();
 };
 
 c._read = function () {
@@ -85,16 +86,8 @@ c._read = function () {
     return _.push('');
   }
 
-  if (!_.initd) {
-    if (!_.initd) {
-      _.init();
-      _.initd = true;
-    }
-    return _.push('');
-  }
-
   if ( obj = _.parser.read() ) {
-    _.push(obj);
+    return _.push(JSON.stringify(obj));
   } else {
     _.push('');
   }
@@ -111,9 +104,15 @@ c.init = function () {
   _.reader = new reader({atom: 1, hetatm: 1, model: 1, endmdl: 1, conect: 1, master: 1});
   _.parser = new parser(_.id, _.mdl);
 
-  _.req.pipe(_.reader).pipe(_.parser).on('readable', function () {
+  _.parser.on('end', function () {
+    _.push(null);
+  });  
+
+  _.parser.on('readable', function () {
     _.read(0);
   });
+
+  _.req.pipe(_.reader).pipe(_.parser);
 };
 
 c.skipnl = function () {

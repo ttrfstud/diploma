@@ -55,13 +55,14 @@ r.init = function () {
 
   var _;
   var opts;
+  var req;
 
   _ = this;
 
   opts = copy(options);
   opts.path = opts.path + _.id + '.pdb';
 
-  _req(opts, function (res) {
+  req = _req(opts, function (res) {
     _.src = res;
 
     _.src.on('end', function () {
@@ -72,7 +73,9 @@ r.init = function () {
     _.src.on('readable', function () {
       _.read(0);
     });
-  }).end();
+  });
+
+  req.end();
 };
 
 r._read = function () {
