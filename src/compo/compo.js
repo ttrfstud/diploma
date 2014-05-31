@@ -2,7 +2,8 @@ var dstr   = require('stream').Duplex;
 var req    = require('../req/req');
 var reader = require('../reader/reader');
 var parser = require('../parser/parser');
-var jsstr = require('../jsstr/jsstr');
+var jsstr  = require('../jsstr/jsstr');
+var fltrs  = require('../filters');
 var util   = require('util');
 util.inherits(compo, dstr);
 
@@ -23,6 +24,7 @@ function compo(uf) {
 
 	_.buf = '';
   _.uf = uf;
+  _.filters = [];
 }
 
 var c = compo.prototype;
@@ -30,6 +32,7 @@ var c = compo.prototype;
 c._write = function (chunk, e, fin) {
 	var _;
   var splt;
+  var asstr;
 
 	_ = this;
 
@@ -37,7 +40,13 @@ c._write = function (chunk, e, fin) {
     return fin();
   }
 
-	_.buf += chunk.toString('utf8');
+  asstr = chunk.toString('utf8');
+
+  while (asstr.indexOf('-') !== -1) {
+    asstr = stripfilter.call(_, asstr);
+  }
+
+	_.buf += asstr;
 
   _.skipnl();
 
@@ -92,6 +101,26 @@ c._read = function () {
   }
 };
 
+function formfilterpipe() {
+  var i;
+  var _;
+  var fltr;
+  var handle;
+
+  _ = this;
+
+  handle = _.req;
+
+  for (i = 0; i < _.filters.length; i++) {
+    fltr = fltrs[_.filters[i]]
+    if (fltr) {
+      handle = handle.pipe(fltr);
+    }
+  }
+
+  handle.pipe(_.parser);
+}
+
 c.init = function () {
   var _;
 
@@ -141,7 +170,11 @@ c.init = function () {
       _._read();
   });
 
-  _.req.pipe(_.reader).pipe(_.parser);
+  if (_.filters.length) {
+    formfilterpipe.call(_);
+  } else {
+    _.req.pipe(_.reader).pipe(_.parser);
+  }
 };
 
 c.skipnl = function () {

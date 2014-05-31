@@ -89,6 +89,7 @@ r.det = function () {
     _.chnk = _.chnk.slice(1);
     
     if (!_.arr) {
+      console.log(_.chnk.toString()); // FAT TODO!
       thrw();
     }
   }
